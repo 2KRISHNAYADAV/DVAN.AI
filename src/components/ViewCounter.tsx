@@ -4,7 +4,8 @@ import { Eye } from 'lucide-react';
 const ViewCounter = () => {
   const [views, setViews] = useState(() => {
     const savedViews = localStorage.getItem('pageViews');
-    return savedViews ? parseInt(savedViews) : 0;
+    // Start from 2000 if no previous views are stored
+    return savedViews ? parseInt(savedViews) : 2000;
   });
 
   useEffect(() => {
