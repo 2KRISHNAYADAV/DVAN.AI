@@ -22,42 +22,40 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
     const median = sorted[Math.floor(sorted.length / 2)];
     const missing = data.length - values.length;
 
-    // Calculate frequency distribution for pie chart
+    // Calculate frequency distribution for pie chart - using fewer buckets
+    const bucketSize = Math.ceil((Math.max(...values) - Math.min(...values)) / 5); // Only 5 buckets
     const frequencyMap = values.reduce((acc: { [key: string]: number }, val) => {
-      const bucket = Math.floor(val);
-      acc[bucket] = (acc[bucket] || 0) + 1;
+      const bucket = Math.floor(val / bucketSize) * bucketSize;
+      const bucketLabel = `${bucket}-${bucket + bucketSize}`;
+      acc[bucketLabel] = (acc[bucketLabel] || 0) + 1;
       return acc;
     }, {});
 
-    const pieData = Object.entries(frequencyMap).map(([key, value]) => ({
-      name: key,
-      value: value
-    }));
+    const pieData = Object.entries(frequencyMap)
+      .map(([key, value]) => ({
+        name: key,
+        value: value
+      }))
+      .slice(0, 5); // Limit to top 5 frequency ranges
 
     return { mean, median, missing, pieData };
   };
 
+  // Only process numeric columns
   const numericColumns = columns.filter(column => {
     const sample = data[0][column];
     return !isNaN(parseFloat(sample));
   });
 
-  // Create pairwise data for scatter plots
+  // Get pairwise data for scatter plots - limit to first 1000 points for performance
   const getPairwiseData = (col1: string, col2: string) => {
-    return data.map(row => ({
-      x: parseFloat(row[col1]),
-      y: parseFloat(row[col2])
-    })).filter(point => !isNaN(point.x) && !isNaN(point.y));
-  };
-
-  // Calculate log-transformed data
-  const getLogData = (column: string) => {
     return data
+      .slice(0, 1000)
       .map(row => ({
-        value: parseFloat(row[column]),
-        logValue: Math.log(parseFloat(row[column]))
+        x: parseFloat(row[col1]),
+        y: parseFloat(row[col2])
       }))
-      .filter(item => !isNaN(item.value) && item.value > 0);
+      .filter(point => !isNaN(point.x) && !isNaN(point.y));
   };
 
   return (
@@ -92,95 +90,82 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
         })}
       </div>
 
-      {/* Distribution Charts */}
+      {/* Main Analysis Cards - One per numeric column */}
       {numericColumns.map(column => (
-        <div key={column} className="space-y-8">
-          <Card className="p-6">
-            <CardHeader>
-              <CardTitle>{column} Analysis</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Regular Distribution */}
+        <Card key={column} className="p-6">
+          <CardHeader>
+            <CardTitle>{column} Analysis</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {/* Distribution Chart */}
+            <div>
+              <h4 className="text-lg font-medium mb-4">Distribution</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data.slice(0, 100)}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey={column} />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey={column} fill="#8B5CF6" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Frequency Distribution (Pie Chart) */}
+            <div>
+              <h4 className="text-lg font-medium mb-4">Frequency Distribution</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={calculateStats(column).pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label
+                  >
+                    {calculateStats(column).pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Pairwise Analysis - Only show for the first related column */}
+            {numericColumns[0] !== column && (
               <div>
-                <h4 className="text-lg font-medium mb-4">Value Distribution</h4>
+                <h4 className="text-lg font-medium mb-4">
+                  Correlation with {numericColumns[0]}
+                </h4>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={data}>
+                  <ScatterChart>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey={column} />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey={column} fill="#8B5CF6" />
-                  </BarChart>
+                    <XAxis 
+                      dataKey="x" 
+                      name={numericColumns[0]}
+                      type="number"
+                    />
+                    <YAxis 
+                      dataKey="y" 
+                      name={column}
+                      type="number"
+                    />
+                    <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                    <Scatter
+                      name={`${numericColumns[0]} vs ${column}`}
+                      data={getPairwiseData(numericColumns[0], column)}
+                      fill="#6E59A5"
+                    />
+                  </ScatterChart>
                 </ResponsiveContainer>
               </div>
-
-              {/* Log Distribution */}
-              <div>
-                <h4 className="text-lg font-medium mb-4">Log Distribution</h4>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={getLogData(column)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="value" />
-                    <YAxis dataKey="logValue" />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="logValue" stroke="#D946EF" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Frequency Distribution (Pie Chart) */}
-              <div>
-                <h4 className="text-lg font-medium mb-4">Frequency Distribution</h4>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={calculateStats(column).pieData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={100}
-                      fill="#8884d8"
-                      label
-                    >
-                      {calculateStats(column).pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Pairwise Comparisons */}
-          {numericColumns
-            .filter(col2 => col2 !== column)
-            .map(col2 => (
-              <Card key={`${column}-${col2}`} className="p-6">
-                <CardHeader>
-                  <CardTitle>Pairwise Analysis: {column} vs {col2}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <ScatterChart>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="x" name={column} />
-                      <YAxis dataKey="y" name={col2} />
-                      <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                      <Scatter
-                        name={`${column} vs ${col2}`}
-                        data={getPairwiseData(column, col2)}
-                        fill="#6E59A5"
-                      />
-                    </ScatterChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            ))}
-        </div>
+            )}
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
