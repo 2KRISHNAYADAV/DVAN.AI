@@ -4,13 +4,13 @@ import { Eye } from 'lucide-react';
 const ViewCounter = () => {
   const [views, setViews] = useState(() => {
     const savedViews = localStorage.getItem('pageViews');
-    // Start from 2000 if no previous views are stored
-    return savedViews ? parseInt(savedViews) : 2000;
+    // Start from 4 if no previous views are stored
+    return savedViews ? Math.min(parseInt(savedViews), 2000) : 4;
   });
 
   useEffect(() => {
     const incrementViews = () => {
-      const newViews = views + 1;
+      const newViews = Math.min(views + 1, 2000); // Cap at 2000 views
       setViews(newViews);
       localStorage.setItem('pageViews', newViews.toString());
     };
