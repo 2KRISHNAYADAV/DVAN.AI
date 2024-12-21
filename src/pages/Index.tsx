@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Papa from 'papaparse';
 import FileUpload from '@/components/FileUpload';
 import DataAnalysis from '@/components/DataAnalysis';
+import ViewCounter from '@/components/ViewCounter';
 import { toast } from 'sonner';
 import { LineChart, BarChart, Database, PieChart, Sparkles } from 'lucide-react';
 
@@ -9,22 +10,13 @@ const Index = () => {
   const [data, setData] = useState<any[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
 
-  const handleFileUpload = (file: File) => {
-    Papa.parse(file, {
-      header: true,
-      complete: (results) => {
-        if (results.data && results.data.length > 0) {
-          setData(results.data);
-          setColumns(Object.keys(results.data[0]));
-          toast.success('File uploaded successfully');
-        } else {
-          toast.error('Error parsing file');
-        }
-      },
-      error: () => {
-        toast.error('Error parsing file');
-      }
-    });
+  const handleFileUpload = (processedData: any[]) => {
+    if (processedData && processedData.length > 0) {
+      setData(processedData);
+      setColumns(Object.keys(processedData[0]));
+    } else {
+      toast.error('No data found in file');
+    }
   };
 
   return (
@@ -79,7 +71,7 @@ const Index = () => {
                   <Database className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-gray-800 mb-2">Data Processing</h3>
-                <p className="text-gray-600 text-sm">Efficient handling of large datasets</p>
+                <p className="text-gray-600 text-sm">Support for CSV and Excel files</p>
               </div>
               <div className="p-6 bg-white rounded-xl shadow-sm border border-violet-100 hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 bg-violet-100 rounded-lg flex items-center justify-center mb-4">
@@ -99,6 +91,7 @@ const Index = () => {
           <DataAnalysis data={data} columns={columns} />
         )}
       </div>
+      <ViewCounter />
     </div>
   );
 };
