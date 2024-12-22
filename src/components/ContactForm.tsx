@@ -16,6 +16,9 @@ import {
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+// Initialize EmailJS with your public key
+emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your actual public key
+
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
@@ -38,14 +41,15 @@ const ContactForm = () => {
         from_name: values.name,
         from_email: values.email,
         message: values.message,
-        to_email: 'darya780945@gmail.com',
+        to_name: 'Support Team',
+        reply_to: values.email,
       };
 
       await emailjs.send(
-        'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
-        'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
+        'YOUR_SERVICE_ID',     // Replace with your EmailJS service ID
+        'YOUR_TEMPLATE_ID',    // Replace with your EmailJS template ID
         templateParams,
-        'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+        'YOUR_PUBLIC_KEY'      // Replace with your EmailJS public key
       );
 
       toast.success('Message sent successfully! We will get back to you soon.');
