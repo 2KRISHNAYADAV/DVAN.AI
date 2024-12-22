@@ -16,7 +16,7 @@ import {
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-// Initialize EmailJS
+// Initialize EmailJS with your public key
 emailjs.init("KK2W9IP9oHI4oklfm");
 
 const formSchema = z.object({
@@ -45,18 +45,15 @@ const ContactForm = () => {
         reply_to: values.email,
       };
 
-      const response = await emailjs.send(
-        "service_yx7vlbk",
-        "template_ad11d58",
+      // Send email using EmailJS
+      await emailjs.send(
+        "service_yx7vlbk",  // Your Service ID
+        "template_ad11d58", // Your Template ID
         templateParams
       );
 
-      if (response.status === 200) {
-        toast.success('Message sent successfully! We will get back to you soon.');
-        form.reset();
-      } else {
-        throw new Error('Failed to send message');
-      }
+      toast.success('Message sent successfully! We will get back to you soon.');
+      form.reset();
     } catch (error) {
       console.error('Error sending email:', error);
       toast.error('Failed to send message. Please try again later.');
