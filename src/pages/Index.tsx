@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Papa from 'papaparse';
 import FileUpload from '@/components/FileUpload';
 import DataAnalysis from '@/components/DataAnalysis';
-import ViewCounter from '@/components/ViewCounter';
 import { toast } from 'sonner';
 import { LineChart, BarChart, Database, PieChart, Sparkles, Mail } from 'lucide-react';
 
@@ -113,7 +112,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-      <ViewCounter />
     </div>
   );
 };
