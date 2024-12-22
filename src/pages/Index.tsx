@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Papa from 'papaparse';
 import FileUpload from '@/components/FileUpload';
 import DataAnalysis from '@/components/DataAnalysis';
+import ContactForm from '@/components/ContactForm';
 import { toast } from 'sonner';
 import { LineChart, BarChart, Database, PieChart, Sparkles, Mail } from 'lucide-react';
 
@@ -90,25 +91,26 @@ const Index = () => {
           <DataAnalysis data={data} columns={columns} />
         )}
 
-        {/* Message Section */}
-        <div className="max-w-4xl mx-auto mt-16 bg-white rounded-xl shadow-sm border border-purple-100 p-8">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <Mail className="w-6 h-6 text-purple-600" />
-            <h2 className="text-2xl font-semibold text-gray-800">Contact Us</h2>
-          </div>
-          <div className="text-center space-y-4">
-            <p className="text-gray-600">
-              Have questions or need assistance? Feel free to reach out to us at:
-            </p>
-            <a 
-              href="mailto:darya780945@gmail.com" 
-              className="inline-flex items-center space-x-2 text-lg font-medium text-purple-600 hover:text-purple-700 transition-colors"
-            >
-              <span>darya780945@gmail.com</span>
-            </a>
-            <p className="text-sm text-gray-500">
-              We'll get back to you as soon as possible!
-            </p>
+        {/* Contact Section */}
+        <div className="max-w-4xl mx-auto mt-16">
+          <div className="bg-white rounded-xl shadow-sm border border-purple-100 p-8">
+            <div className="text-center space-y-4 mb-8">
+              <div className="flex items-center justify-center space-x-3 mb-4">
+                <Mail className="w-6 h-6 text-purple-600" />
+                <h2 className="text-2xl font-semibold text-gray-800">Contact Us</h2>
+              </div>
+              <p className="text-gray-600">
+                Have questions or need assistance? Feel free to reach out to us using the form below or email us directly at:
+              </p>
+              <a 
+                href="mailto:darya780945@gmail.com" 
+                className="inline-flex items-center space-x-2 text-lg font-medium text-purple-600 hover:text-purple-700 transition-colors"
+              >
+                <span>darya780945@gmail.com</span>
+              </a>
+            </div>
+            
+            <ContactForm />
           </div>
         </div>
       </div>
