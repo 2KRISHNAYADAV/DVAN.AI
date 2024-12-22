@@ -16,8 +16,8 @@ import {
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-// Initialize EmailJS with your public key
-emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your actual public key
+// Initialize EmailJS
+emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '');
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -45,15 +45,18 @@ const ContactForm = () => {
         reply_to: values.email,
       };
 
-      await emailjs.send(
-        'YOUR_SERVICE_ID',     // Replace with your EmailJS service ID
-        'YOUR_TEMPLATE_ID',    // Replace with your EmailJS template ID
-        templateParams,
-        'YOUR_PUBLIC_KEY'      // Replace with your EmailJS public key
+      const response = await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID || '',
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
+        templateParams
       );
 
-      toast.success('Message sent successfully! We will get back to you soon.');
-      form.reset();
+      if (response.status === 200) {
+        toast.success('Message sent successfully! We will get back to you soon.');
+        form.reset();
+      } else {
+        throw new Error('Failed to send message');
+      }
     } catch (error) {
       console.error('Error sending email:', error);
       toast.error('Failed to send message. Please try again later.');
