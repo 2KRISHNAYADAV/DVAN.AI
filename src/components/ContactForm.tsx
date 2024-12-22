@@ -47,7 +47,7 @@ const ContactForm = () => {
 
       // Send email using EmailJS
       await emailjs.send(
-        "service_yx7vlbk",  // Your Service ID
+        "service_15bvd8f",  // Your Service ID
         "template_ad11d58", // Your Template ID
         templateParams
       );
@@ -56,7 +56,7 @@ const ContactForm = () => {
       form.reset();
     } catch (error) {
       console.error('Error sending email:', error);
-      toast.error('Failed to send message. Please try again later.');
+      toast.error('Failed 😕 to send message. Please try again later I AM WORKING ON 😊.');
     }
   };
 
