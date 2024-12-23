@@ -86,8 +86,13 @@ const Index = () => {
             {/* Analysis Methods Section */}
             <AnalysisMethods />
 
+            {/* Inferential Analysis Section */}
+            <div className="mt-8">
+              <InferentialAnalysis />
+            </div>
+
             {/* Upload Section */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-purple-100">
+            <div className="mt-8 bg-white p-8 rounded-2xl shadow-sm border border-purple-100">
               <FileUpload onFileUpload={handleFileUpload} />
             </div>
           </div>
