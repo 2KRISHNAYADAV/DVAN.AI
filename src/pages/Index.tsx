@@ -5,6 +5,7 @@ import DataAnalysis from '@/components/DataAnalysis';
 import ContactForm from '@/components/ContactForm';
 import AnalysisMethods from '@/components/AnalysisMethods';
 import InferentialAnalysis from '@/components/InferentialAnalysis';
+import PredictiveAnalysis from '@/components/PredictiveAnalysis';
 import { toast } from 'sonner';
 import { LineChart, BarChart, Database, PieChart, Sparkles, Mail } from 'lucide-react';
 
