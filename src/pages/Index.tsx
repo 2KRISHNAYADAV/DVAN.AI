@@ -92,6 +92,11 @@ const Index = () => {
               <InferentialAnalysis />
             </div>
 
+            {/* Predictive Analysis Section */}
+            <div className="mt-8">
+              <PredictiveAnalysis />
+            </div>
+
             {/* Upload Section */}
             <div className="mt-8 bg-white p-8 rounded-2xl shadow-sm border border-purple-100">
               <FileUpload onFileUpload={handleFileUpload} />
