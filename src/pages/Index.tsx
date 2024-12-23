@@ -3,6 +3,7 @@ import Papa from 'papaparse';
 import FileUpload from '@/components/FileUpload';
 import DataAnalysis from '@/components/DataAnalysis';
 import ContactForm from '@/components/ContactForm';
+import AnalysisMethods from '@/components/AnalysisMethods';
 import { toast } from 'sonner';
 import { LineChart, BarChart, Database, PieChart, Sparkles, Mail } from 'lucide-react';
 
@@ -81,6 +82,9 @@ const Index = () => {
                 <p className="text-gray-600 text-sm">Smart insights and predictions</p>
               </div>
             </div>
+
+            {/* Analysis Methods Section */}
+            <AnalysisMethods />
 
             {/* Upload Section */}
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-purple-100">
