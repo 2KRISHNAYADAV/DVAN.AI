@@ -7,7 +7,7 @@ import AnalysisMethods from '@/components/AnalysisMethods';
 import InferentialAnalysis from '@/components/InferentialAnalysis';
 import PredictiveAnalysis from '@/components/PredictiveAnalysis';
 import { toast } from 'sonner';
-import { LineChart, BarChart, Database, PieChart, Sparkles, Mail } from 'lucide-react';
+import { LineChart, BarChart, Database, PieChart, Sparkles, Mail, Instagram, Github, Linkedin } from 'lucide-react';
 
 const Index = () => {
   const [data, setData] = useState<any[]>([]);
@@ -127,6 +127,52 @@ const Index = () => {
             </div>
             
             <ContactForm />
+          </div>
+        </div>
+
+        {/* Social Media Links */}
+        <div className="max-w-4xl mx-auto mt-16 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-purple-100 p-8">
+            <div className="text-center space-y-6">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Connect With Me</h2>
+              <div className="flex justify-center space-x-8">
+                <a
+                  href="https://www.instagram.com/krishnayaduvansy58/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col items-center space-y-2 transition-transform hover:scale-110"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center transform transition-all duration-300 group-hover:rotate-6">
+                    <Instagram className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-600 group-hover:text-purple-600">Instagram</span>
+                </a>
+
+                <a
+                  href="https://github.com/2KRISHNAYADAV"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col items-center space-y-2 transition-transform hover:scale-110"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center transform transition-all duration-300 group-hover:rotate-6">
+                    <Github className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-600 group-hover:text-gray-900">GitHub</span>
+                </a>
+
+                <a
+                  href="https://www.linkedin.com/in/krishna-yadav-392b61300"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col items-center space-y-2 transition-transform hover:scale-110"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center transform transition-all duration-300 group-hover:rotate-6">
+                    <Linkedin className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-600 group-hover:text-blue-600">LinkedIn</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
