@@ -6,6 +6,7 @@ import ContactForm from '@/components/ContactForm';
 import AnalysisMethods from '@/components/AnalysisMethods';
 import InferentialAnalysis from '@/components/InferentialAnalysis';
 import PredictiveAnalysis from '@/components/PredictiveAnalysis';
+import Navigation from '@/components/Navigation';
 import { toast } from 'sonner';
 import { LineChart, BarChart, Database, PieChart, Sparkles, Mail, Instagram, Github, Linkedin } from 'lucide-react';
 
@@ -24,8 +25,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Hero Section */}
+      <Navigation />
+      <div className="max-w-7xl mx-auto px-4 py-12 pt-20">
         <div className="text-center space-y-6 mb-16">
           <h1 className="text-4xl font-bold text-center mb-2">
             <span className="inline-block animate-bounce text-[#9b87f5]">D</span>
