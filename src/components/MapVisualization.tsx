@@ -5,62 +5,84 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 interface MapVisualizationProps {
-  data?: any[];
-  geoLevel: 'country' | 'state';
+  data: any[];
+  geoLevel?: 'country' | 'state';
 }
 
 const MapVisualization = ({ data, geoLevel = 'country' }: MapVisualizationProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const mapInstance = useRef<mapboxgl.Map | null>(null);
   
   // Default public token (this is a public demo token, replace with your own in production)
   const defaultToken = 'pk.eyJ1Ijoia3Jpc2huYXlhZGF2IiwiYSI6ImNsdGVxOWF0cjE5ZWsyam8wbm5xZnV0Y2QifQ.YfY_vI6z8nQF9kVY0qfBtA';
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    let isMounted = true;
 
-    try {
-      mapboxgl.accessToken = defaultToken;
-      
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        projection: 'mercator',
-        zoom: geoLevel === 'country' ? 1.5 : 3,
-        center: [0, 20],
-        pitch: 45,
-      });
+    const initializeMap = async () => {
+      if (!mapContainer.current || !isMounted) return;
 
-      // Add navigation controls
-      map.current.addControl(
-        new mapboxgl.NavigationControl({
-          visualizePitch: true,
-        }),
-        'top-right'
-      );
+      try {
+        // Clean up existing map instance
+        if (mapInstance.current) {
+          mapInstance.current.remove();
+          mapInstance.current = null;
+        }
 
-      // Add atmosphere and fog effects
-      map.current.on('style.load', () => {
-        map.current?.setFog({
-          color: 'rgb(255, 255, 255)',
-          'high-color': 'rgb(200, 200, 225)',
-          'horizon-blend': 0.2,
+        mapboxgl.accessToken = defaultToken;
+        
+        const newMap = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/light-v11',
+          center: [0, 20],
+          zoom: 1.5,
         });
 
-        // If we have data, add it to the map
-        if (data) {
-          // Add data layer logic here based on geoLevel
-          toast.success(`Map data loaded for ${geoLevel} level analysis`);
+        // Only store the map instance if component is still mounted
+        if (isMounted) {
+          mapInstance.current = newMap;
+
+          newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+          newMap.addControl(new mapboxgl.FullscreenControl());
+
+          // Add atmosphere and terrain for better visualization
+          newMap.on('load', () => {
+            if (!isMounted) return;
+            
+            newMap.setFog({
+              'color': 'rgb(186, 210, 235)',
+              'high-color': 'rgb(36, 92, 223)',
+              'horizon-blend': 0.02
+            });
+
+            newMap.addSource('mapbox-dem', {
+              'type': 'raster-dem',
+              'url': 'mapbox://mapbox.terrain-rgb'
+            });
+
+            newMap.setTerrain({
+              'source': 'mapbox-dem',
+              'exaggeration': 1.5
+            });
+          });
         }
-      });
+      } catch (error) {
+        console.error('Error initializing map:', error);
+        if (isMounted) {
+          toast.error('Error initializing map. Please check network connection.');
+        }
+      }
+    };
 
-    } catch (error) {
-      console.error('Error initializing map:', error);
-      toast.error('Error initializing map. Please check network connection.');
-    }
+    initializeMap();
 
+    // Cleanup function
     return () => {
-      map.current?.remove();
+      isMounted = false;
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
     };
   }, [data, geoLevel]);
 
