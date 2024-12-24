@@ -41,7 +41,7 @@ const Navigation = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Dattashodhini AI - Powerful Data Analysis Platform</p>
+                  <p>Dattashodhini AI – Empowering Precision Through Intelligent Data Cleaning</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
