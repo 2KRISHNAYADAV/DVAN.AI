@@ -5,6 +5,7 @@ import {
   Legend
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import MapVisualization from './MapVisualization';
 
 interface DataAnalysisProps {
   data: any[];
@@ -58,8 +59,27 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
       .filter(point => !isNaN(point.x) && !isNaN(point.y));
   };
 
+  // Determine if we have geographic data
+  const hasCountryData = columns.some(col => 
+    col.toLowerCase().includes('country') || 
+    col.toLowerCase().includes('nation')
+  );
+  
+  const hasStateData = columns.some(col => 
+    col.toLowerCase().includes('state') || 
+    col.toLowerCase().includes('province')
+  );
+
   return (
     <div className="space-y-8">
+      {/* Geographic Visualization */}
+      {(hasCountryData || hasStateData) && (
+        <MapVisualization 
+          data={data}
+          geoLevel={hasStateData ? 'state' : 'country'}
+        />
+      )}
+
       {/* Statistical Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {numericColumns.map(column => {
