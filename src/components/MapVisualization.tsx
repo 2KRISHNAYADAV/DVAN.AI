@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,80 +11,69 @@ interface MapVisualizationProps {
 
 const MapVisualization = ({ data, geoLevel = 'country' }: MapVisualizationProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<mapboxgl.Map | null>(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
   
   // Default public token
   const defaultToken = 'pk.eyJ1Ijoia3Jpc2huYXlhZGF2MDkyIiwiYSI6ImNtNTJwdDVxbjF3NWoya3A3ZnM4eXU3aDAifQ.5Porn99vKusH4MDAhbK1Wg';
 
   useEffect(() => {
-    let isMounted = true;
+    mapboxgl.accessToken = defaultToken;
 
-    const initializeMap = async () => {
-      if (!mapContainer.current || !isMounted) return;
+    if (!mapContainer.current || map) return;
 
-      try {
-        // Clean up existing map instance
-        if (mapInstance.current) {
-          mapInstance.current.remove();
-          mapInstance.current = null;
-        }
+    try {
+      const newMap = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [0, 20],
+        zoom: 1.5,
+      });
 
-        mapboxgl.accessToken = defaultToken;
-        
-        const newMap = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/light-v11',
-          center: [0, 20],
-          zoom: 1.5,
+      newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      newMap.addControl(new mapboxgl.FullscreenControl());
+
+      newMap.on('load', () => {
+        newMap.setFog({
+          'color': 'rgb(186, 210, 235)',
+          'high-color': 'rgb(36, 92, 223)',
+          'horizon-blend': 0.02
         });
 
-        // Only store the map instance if component is still mounted
-        if (isMounted) {
-          mapInstance.current = newMap;
+        newMap.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.terrain-rgb'
+        });
 
-          newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
-          newMap.addControl(new mapboxgl.FullscreenControl());
+        newMap.setTerrain({
+          'source': 'mapbox-dem',
+          'exaggeration': 1.5
+        });
+      });
 
-          // Add atmosphere and terrain for better visualization
-          newMap.on('load', () => {
-            if (!isMounted) return;
-            
-            newMap.setFog({
-              'color': 'rgb(186, 210, 235)',
-              'high-color': 'rgb(36, 92, 223)',
-              'horizon-blend': 0.02
-            });
-
-            newMap.addSource('mapbox-dem', {
-              'type': 'raster-dem',
-              'url': 'mapbox://mapbox.terrain-rgb'
-            });
-
-            newMap.setTerrain({
-              'source': 'mapbox-dem',
-              'exaggeration': 1.5
-            });
-          });
-        }
-      } catch (error) {
-        console.error('Error initializing map:', error);
-        if (isMounted) {
-          toast.error('Error initializing map. Please check network connection.');
-        }
-      }
-    };
-
-    initializeMap();
+      setMap(newMap);
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      toast.error('Error initializing map. Please check network connection.');
+    }
 
     // Cleanup function
     return () => {
-      isMounted = false;
-      if (mapInstance.current) {
-        mapInstance.current.remove();
-        mapInstance.current = null;
+      if (map) {
+        map.remove();
+        setMap(null);
       }
     };
-  }, [data, geoLevel]);
+  }, []);
+
+  // Update map when data or geoLevel changes
+  useEffect(() => {
+    if (!map || !data) return;
+
+    // Here you can add your data visualization logic
+    // This will run whenever data or geoLevel changes
+    // and the map is already initialized
+
+  }, [map, data, geoLevel]);
 
   return (
     <Card className="w-full">
