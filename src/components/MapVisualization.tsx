@@ -13,8 +13,8 @@ const MapVisualization = ({ data, geoLevel = 'country' }: MapVisualizationProps)
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   
-  // Default public token (this is a public demo token, replace with your own in production)
-  const defaultToken = 'pk.eyJ1Ijoia3Jpc2huYXlhZGF2IiwiYSI6ImNsdGVxOWF0cjE5ZWsyam8wbm5xZnV0Y2QifQ.YfY_vI6z8nQF9kVY0qfBtA';
+  // Default public token
+  const defaultToken = 'pk.eyJ1Ijoia3Jpc2huYXlhZGF2MDkyIiwiYSI6ImNtNTJwdDVxbjF3NWoya3A3ZnM4eXU3aDAifQ.5Porn99vKusH4MDAhbK1Wg';
 
   useEffect(() => {
     let isMounted = true;
