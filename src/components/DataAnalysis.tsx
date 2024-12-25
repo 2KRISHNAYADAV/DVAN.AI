@@ -1,20 +1,30 @@
 import React from 'react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  ScatterChart, Scatter, LineChart, Line, PieChart, Pie, Cell,
-  Legend
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  PieChart,
+  Pie,
+  ScatterChart,
+  Scatter,
+  Cell,
+  ResponsiveContainer,
+  Legend,
 } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import MapVisualization from './MapVisualization';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
-interface DataAnalysisProps {
-  data: any[];
-  columns: string[];
-}
-
-const COLORS = ['#8B5CF6', '#D946EF', '#6E59A5', '#9b87f5', '#D6BCFA'];
-
-const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
+const DataAnalysis = ({ data, columns }: { data: any[], columns: string[] }) => {
   const calculateStats = (column: string) => {
     const values = data.map(row => parseFloat(row[column])).filter(val => !isNaN(val));
     const sum = values.reduce((acc, val) => acc + val, 0);
@@ -80,37 +90,30 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
   );
 
   return (
-    <div className="space-y-8">
-      {/* Geographic Visualization */}
-      {(hasCountryData || hasStateData) && (
-        <MapVisualization 
-          data={data}
-          geoLevel={hasStateData ? 'state' : 'country'}
-        />
-      )}
-
-      {/* Statistical Summary Cards */}
+    <div className="w-full space-y-6 p-4">
+      {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {numericColumns.map(column => {
           const stats = calculateStats(column);
           return (
-            <Card key={column} className="stats-card">
+            <Card key={`stats-${column}`} className="p-4">
               <CardHeader>
                 <CardTitle className="text-lg">{column}</CardTitle>
+                <CardDescription>Summary Statistics</CardDescription>
               </CardHeader>
               <CardContent>
                 <dl className="space-y-2">
                   <div className="flex justify-between">
-                    <dt className="text-sm text-muted-foreground">Mean</dt>
-                    <dd className="text-sm font-medium">{stats.mean.toFixed(2)}</dd>
+                    <dt>Mean:</dt>
+                    <dd>{stats.mean.toFixed(2)}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-sm text-muted-foreground">Median</dt>
-                    <dd className="text-sm font-medium">{stats.median.toFixed(2)}</dd>
+                    <dt>Median:</dt>
+                    <dd>{stats.median.toFixed(2)}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-sm text-muted-foreground">Missing Values</dt>
-                    <dd className="text-sm font-medium">{stats.missing}</dd>
+                    <dt>Missing Values:</dt>
+                    <dd>{stats.missing}</dd>
                   </div>
                 </dl>
               </CardContent>
@@ -121,82 +124,112 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
 
       {/* Main Analysis Cards */}
       {numericColumns.map(column => (
-        <Card key={column} className="p-6">
+        <Card key={column} className="p-4">
           <CardHeader>
             <CardTitle>{column} Analysis</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-8">
-            {/* Distribution Chart */}
-            <div>
-              <h4 className="text-lg font-medium mb-4">Distribution</h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={formatBarChartData(column)}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis label={{ value: column, angle: -90, position: 'insideLeft' }} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar name={column} dataKey={column} fill="#8B5CF6" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Frequency Distribution */}
-            <div>
-              <h4 className="text-lg font-medium mb-4">Frequency Distribution</h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={calculateStats(column).pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label
-                  >
-                    {calculateStats(column).pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Pairwise Analysis */}
-            {numericColumns[0] !== column && (
-              <div>
-                <h4 className="text-lg font-medium mb-4">
-                  Correlation with {numericColumns[0]}
-                </h4>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Distribution Chart */}
+              <div className="min-h-[400px]">
+                <h4 className="text-lg font-medium mb-4">Distribution</h4>
                 <ResponsiveContainer width="100%" height={300}>
-                  <ScatterChart>
+                  <BarChart data={formatBarChartData(column)}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
-                      dataKey="x" 
-                      name={numericColumns[0]}
-                      type="number"
-                      label={{ value: numericColumns[0], position: 'bottom' }}
+                      dataKey="name" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                      interval={0}
+                      tick={{ fontSize: 12 }}
                     />
                     <YAxis 
-                      dataKey="y" 
-                      name={column}
-                      type="number"
-                      label={{ value: column, angle: -90, position: 'insideLeft' }}
+                      label={{ 
+                        value: column, 
+                        angle: -90, 
+                        position: 'insideLeft',
+                        style: { textAnchor: 'middle' }
+                      }} 
                     />
-                    <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                    <Tooltip />
                     <Legend />
-                    <Scatter
-                      name={`${numericColumns[0]} vs ${column}`}
-                      data={getPairwiseData(numericColumns[0], column)}
-                      fill="#6E59A5"
-                    />
-                  </ScatterChart>
+                    <Bar name={column} dataKey={column} fill="#8B5CF6" />
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
-            )}
+
+              {/* Frequency Distribution */}
+              <div className="min-h-[400px]">
+                <h4 className="text-lg font-medium mb-4">Frequency Distribution</h4>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={calculateStats(column).pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label={({ name, percent }) => 
+                        `${name} (${(percent * 100).toFixed(0)}%)`
+                      }
+                    >
+                      {calculateStats(column).pieData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={`hsl(${(index * 360) / 5}, 70%, 50%)`} 
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Pairwise Analysis */}
+              {numericColumns[0] !== column && (
+                <div className="col-span-full min-h-[400px]">
+                  <h4 className="text-lg font-medium mb-4">
+                    Correlation with {numericColumns[0]}
+                  </h4>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ScatterChart>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="x"
+                        name={numericColumns[0]}
+                        type="number"
+                        label={{
+                          value: numericColumns[0],
+                          position: 'bottom',
+                          style: { textAnchor: 'middle' }
+                        }}
+                      />
+                      <YAxis
+                        dataKey="y"
+                        name={column}
+                        type="number"
+                        label={{
+                          value: column,
+                          angle: -90,
+                          position: 'insideLeft',
+                          style: { textAnchor: 'middle' }
+                        }}
+                      />
+                      <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                      <Legend />
+                      <Scatter
+                        name={`${numericColumns[0]} vs ${column}`}
+                        data={getPairwiseData(numericColumns[0], column)}
+                        fill="#8B5CF6"
+                      />
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       ))}
