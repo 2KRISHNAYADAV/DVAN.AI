@@ -23,8 +23,8 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
     const median = sorted[Math.floor(sorted.length / 2)];
     const missing = data.length - values.length;
 
-    // Calculate frequency distribution for pie chart - using fewer buckets
-    const bucketSize = Math.ceil((Math.max(...values) - Math.min(...values)) / 5); // Only 5 buckets
+    // Calculate frequency distribution for pie chart
+    const bucketSize = Math.ceil((Math.max(...values) - Math.min(...values)) / 5);
     const frequencyMap = values.reduce((acc: { [key: string]: number }, val) => {
       const bucket = Math.floor(val / bucketSize) * bucketSize;
       const bucketLabel = `${bucket}-${bucket + bucketSize}`;
@@ -37,7 +37,7 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
         name: key,
         value: value
       }))
-      .slice(0, 5); // Limit to top 5 frequency ranges
+      .slice(0, 5);
 
     return { mean, median, missing, pieData };
   };
@@ -48,11 +48,20 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
     return !isNaN(parseFloat(sample));
   });
 
-  // Get pairwise data for scatter plots - limit to first 1000 points for performance
+  // Format data for bar chart to include names
+  const formatBarChartData = (column: string) => {
+    return data.slice(0, 100).map((item, index) => ({
+      name: item.name || item.title || item.label || `Item ${index + 1}`,
+      [column]: parseFloat(item[column])
+    }));
+  };
+
+  // Get pairwise data for scatter plots
   const getPairwiseData = (col1: string, col2: string) => {
     return data
       .slice(0, 1000)
-      .map(row => ({
+      .map((row, index) => ({
+        name: row.name || row.title || row.label || `Item ${index + 1}`,
         x: parseFloat(row[col1]),
         y: parseFloat(row[col2])
       }))
@@ -110,7 +119,7 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
         })}
       </div>
 
-      {/* Main Analysis Cards - One per numeric column */}
+      {/* Main Analysis Cards */}
       {numericColumns.map(column => (
         <Card key={column} className="p-6">
           <CardHeader>
@@ -121,17 +130,18 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
             <div>
               <h4 className="text-lg font-medium mb-4">Distribution</h4>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data.slice(0, 100)}>
+                <BarChart data={formatBarChartData(column)}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey={column} />
-                  <YAxis />
+                  <XAxis dataKey="name" />
+                  <YAxis label={{ value: column, angle: -90, position: 'insideLeft' }} />
                   <Tooltip />
-                  <Bar dataKey={column} fill="#8B5CF6" />
+                  <Legend />
+                  <Bar name={column} dataKey={column} fill="#8B5CF6" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Frequency Distribution (Pie Chart) */}
+            {/* Frequency Distribution */}
             <div>
               <h4 className="text-lg font-medium mb-4">Frequency Distribution</h4>
               <ResponsiveContainer width="100%" height={300}>
@@ -155,7 +165,7 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
               </ResponsiveContainer>
             </div>
 
-            {/* Pairwise Analysis - Only show for the first related column */}
+            {/* Pairwise Analysis */}
             {numericColumns[0] !== column && (
               <div>
                 <h4 className="text-lg font-medium mb-4">
@@ -168,13 +178,16 @@ const DataAnalysis = ({ data, columns }: DataAnalysisProps) => {
                       dataKey="x" 
                       name={numericColumns[0]}
                       type="number"
+                      label={{ value: numericColumns[0], position: 'bottom' }}
                     />
                     <YAxis 
                       dataKey="y" 
                       name={column}
                       type="number"
+                      label={{ value: column, angle: -90, position: 'insideLeft' }}
                     />
                     <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                    <Legend />
                     <Scatter
                       name={`${numericColumns[0]} vs ${column}`}
                       data={getPairwiseData(numericColumns[0], column)}
