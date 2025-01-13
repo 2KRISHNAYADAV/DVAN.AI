@@ -61,17 +61,17 @@ const InferentialAnalysis = () => {
     <div className="w-full space-y-4">
       <div className="flex justify-between items-center">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight animate-bounce">
+          <h2 className="text-2xl font-bold tracking-tight">
             Inferential Analysis
           </h2>
-          <p className="text-muted-foreground animate-fade-in">
+          <p className="text-muted-foreground">
             Drawing conclusions from data samples through statistical methods
           </p>
         </div>
         <Button
           variant="outline"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="gap-2 hover:scale-105 transition-transform"
+          className="gap-2"
         >
           {isExpanded ? (
             <>
@@ -89,31 +89,31 @@ const InferentialAnalysis = () => {
 
       <div className={cn(
         "grid gap-4 transition-all duration-300",
-        isExpanded ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
+        isExpanded ? "opacity-100 h-auto" : "opacity-0 h-0 overflow-hidden"
       )}>
         <Tabs defaultValue="hypothesis" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 h-auto">
             {sections.map((section) => (
               <TabsTrigger
                 key={section.id}
                 value={section.id}
-                className="flex items-center gap-2 hover:scale-105 transition-transform"
+                className="flex items-center gap-2 py-2 px-4 whitespace-normal text-left h-auto"
               >
-                <section.icon className="h-4 w-4 animate-pulse" />
-                <span className="animate-fade-in">{section.title}</span>
+                <section.icon className="h-4 w-4 flex-shrink-0" />
+                <span>{section.title}</span>
               </TabsTrigger>
             ))}
           </TabsList>
 
           {sections.map((section) => (
-            <TabsContent key={section.id} value={section.id}>
+            <TabsContent key={section.id} value={section.id} className="mt-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 animate-bounce">
+                  <CardTitle className="flex items-center gap-2">
                     <section.icon className="h-6 w-6" />
                     {section.title}
                   </CardTitle>
-                  <CardDescription className="animate-fade-in">
+                  <CardDescription>
                     Detailed explanation of {section.title.toLowerCase()}
                   </CardDescription>
                 </CardHeader>
