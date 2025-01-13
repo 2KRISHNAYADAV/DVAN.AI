@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import FileUpload from '@/components/FileUpload';
 import DataAnalysis from '@/components/DataAnalysis';
 import ContactForm from '@/components/ContactForm';
@@ -8,6 +8,7 @@ import PredictiveAnalysis from '@/components/PredictiveAnalysis';
 import Navigation from '@/components/Navigation';
 import { toast } from 'sonner';
 import Dashboard from '@/components/dashboard/Dashboard';
+import { Button } from '@/components/ui/button';
 import { 
   LineChart, 
   PieChart, 
@@ -16,12 +17,14 @@ import {
   Mail,
   Instagram,
   Github,
-  Linkedin
+  Linkedin,
+  BookOpen
 } from 'lucide-react';
 
 const Index = () => {
   const [data, setData] = useState<any[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
+  const descriptionRef = useRef<HTMLDivElement>(null);
 
   const handleFileUpload = (processedData: any[]) => {
     if (processedData && processedData.length > 0) {
@@ -32,12 +35,70 @@ const Index = () => {
     }
   };
 
+  const scrollToDescription = () => {
+    descriptionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Navigation />
       <div className="max-w-7xl mx-auto px-4 py-12 pt-20">
+        {/* Description Button */}
+        <div className="text-center mb-8">
+          <Button 
+            onClick={scrollToDescription}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-md transition-all"
+          >
+            <BookOpen className="w-5 h-5 mr-2" />
+            How to Use DVAN.AI
+          </Button>
+        </div>
+
         {data.length === 0 ? (
           <div className="max-w-4xl mx-auto">
+            {/* Description Section */}
+            <div ref={descriptionRef} className="bg-white p-8 rounded-xl shadow-sm border border-purple-100 mb-12 animate-fade-in">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Welcome to DVAN.AI</h2>
+              <div className="text-gray-600 space-y-6">
+                <div className="p-4 bg-purple-50 rounded-lg">
+                  <p className="text-purple-800 font-semibold mb-2">Educational Purpose Notice:</p>
+                  <p>Currently, this platform is proposed only for educational purposes.</p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Purpose of the Dashboard</h3>
+                  <p>DVAN.AI is an interactive data analysis dashboard designed to help users visualize, analyze, and derive insights from structured datasets. It provides various analytical tools and visualizations to make data exploration intuitive and informative.</p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">How to Navigate</h3>
+                  <ol className="list-decimal list-inside space-y-2">
+                    <li>Upload your data using the file upload section</li>
+                    <li>Explore the overview panel to see your data in a tabular format</li>
+                    <li>Use the statistics panel to view descriptive analytics</li>
+                    <li>Analyze trends and patterns in the trends section</li>
+                    <li>Explore predictive insights in the predictions panel</li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Data Handling and Cleaning</h3>
+                  <p>All data is processed using DATSH.AI to ensure optimal quality and organization. Our system automatically handles data cleaning and structuring to provide the best analysis experience.</p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Data Requirements</h3>
+                  <p>For optimal results, please ensure your data meets these criteria:</p>
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>Clean, structured format (preferably CSV or Excel)</li>
+                    <li>Organized in x, y pairs or similar structured format</li>
+                    <li>Avoid large unstructured text or messy information</li>
+                    <li>Examples of suitable datasets: world population data, COVID-19 statistics, economic indicators</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               <div className="p-6 bg-white rounded-xl shadow-sm border border-purple-100 hover:shadow-md transition-shadow">
