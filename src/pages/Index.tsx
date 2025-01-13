@@ -8,6 +8,16 @@ import PredictiveAnalysis from '@/components/PredictiveAnalysis';
 import Navigation from '@/components/Navigation';
 import { toast } from 'sonner';
 import Dashboard from '@/components/dashboard/Dashboard';
+import { 
+  LineChart, 
+  PieChart, 
+  Database, 
+  Sparkles,
+  Mail,
+  Instagram,
+  Github,
+  Linkedin
+} from 'lucide-react';
 
 const Index = () => {
   const [data, setData] = useState<any[]>([]);
