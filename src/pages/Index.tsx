@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Papa from 'papaparse';
 import FileUpload from '@/components/FileUpload';
 import DataAnalysis from '@/components/DataAnalysis';
 import ContactForm from '@/components/ContactForm';
@@ -8,7 +7,7 @@ import InferentialAnalysis from '@/components/InferentialAnalysis';
 import PredictiveAnalysis from '@/components/PredictiveAnalysis';
 import Navigation from '@/components/Navigation';
 import { toast } from 'sonner';
-import { LineChart, BarChart, Database, PieChart, Sparkles, Mail, Instagram, Github, Linkedin } from 'lucide-react';
+import Dashboard from '@/components/dashboard/Dashboard';
 
 const Index = () => {
   const [data, setData] = useState<any[]>([]);
@@ -27,31 +26,6 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Navigation />
       <div className="max-w-7xl mx-auto px-4 py-12 pt-20">
-        <div className="text-center space-y-6 mb-16">
-          <h1 className="text-4xl font-bold text-center mb-2">
-            <span className="inline-block animate-bounce text-[#9b87f5]">D</span>
-            <span className="inline-block animate-bounce delay-75 text-[#D946EF]">a</span>
-            <span className="inline-block animate-bounce delay-100 text-[#8B5CF6]">t</span>
-            <span className="inline-block animate-bounce delay-150 text-[#7E69AB]">t</span>
-            <span className="inline-block animate-bounce delay-200 text-[#6E59A5]">a</span>
-            <span className="inline-block animate-bounce delay-300 text-[#D6BCFA]">V</span>
-            <span className="inline-block animate-bounce delay-300 text-[#9b87f5]">i</span>
-            <span className="inline-block animate-bounce delay-400 text-[#D946EF]">s</span>
-            <span className="inline-block animate-bounce delay-500 text-[#8B5CF6]">h</span>
-            <span className="inline-block animate-bounce delay-600 text-[#7E69AB]">L</span>
-            <span className="inline-block animate-bounce delay-700 text-[#6E59A5]">e</span>
-            <span className="inline-block animate-bounce delay-800 text-[#D6BCFA]">s</span>
-            <span className="inline-block animate-bounce delay-900 text-[#9b87f5]">h</span>
-            <span className="inline-block animate-bounce delay-1000 text-[#D946EF]">a</span>
-            <span className="inline-block animate-bounce delay-1100 text-[#8B5CF6]">n</span>
-            <span className="inline-block text-[#7E69AB]">.AI</span>
-          </h1>
-          <p className="text-center text-gray-500 mb-8">(DVAN.AI)</p>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Transform your data into actionable insights with our powerful analytics platform
-          </p>
-        </div>
-
         {data.length === 0 ? (
           <div className="max-w-4xl mx-auto">
             {/* Features Grid */}
@@ -105,7 +79,7 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          <DataAnalysis data={data} columns={columns} />
+          <Dashboard data={data} columns={columns} />
         )}
 
         {/* Contact Section */}
