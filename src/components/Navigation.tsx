@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Info, FolderKanban, Terminal, MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
@@ -16,28 +16,19 @@ import {
 import { Button } from "@/components/ui/button";
 
 const Navigation = () => {
-  const navigate = useNavigate();
-
-  const handleLogoClick = () => {
-    navigate('/');
-  };
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
-          <div 
-            onClick={handleLogoClick}
-            className="flex items-center space-x-2 cursor-pointer"
-          >
+          <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/02d0e3fb-c750-4fbf-84e2-f0da643878f5.png" 
+              src="/lovable-uploads/b147a501-aaa0-4df6-ae76-59e3ec4a1eb8.png" 
               alt="DVAN.AI Logo" 
               className="w-6 h-6"
             />
             <span className="font-bold text-xl">DVAN.AI</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
