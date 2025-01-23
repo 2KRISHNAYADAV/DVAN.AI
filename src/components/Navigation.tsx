@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Info, FolderKanban, Terminal, MoreVertical } from 'lucide-react';
+import { Info, FolderKanban, Terminal, MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +22,11 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
           <Link to="/" className="flex items-center space-x-2">
-            <Terminal className="w-6 h-6 text-purple-600" />
+            <img 
+              src="/lovable-uploads/02d0e3fb-c750-4fbf-84e2-f0da643878f5.png" 
+              alt="DVAN.AI Logo" 
+              className="w-6 h-6"
+            />
             <span className="font-bold text-xl">DVAN.AI</span>
           </Link>
 
