@@ -23,7 +23,7 @@ const Navigation = () => {
           {/* Logo/Brand */}
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/02d0e3fb-c750-4fbf-84e2-f0da643878f5.png" 
+              src="/lovable-uploads/b147a501-aaa0-4df6-ae76-59e3ec4a1eb8.png" 
               alt="DVAN.AI Logo" 
               className="w-6 h-6"
             />
