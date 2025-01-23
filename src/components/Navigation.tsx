@@ -34,7 +34,7 @@ const Navigation = () => {
                   <Button
                     variant="ghost"
                     className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-colors"
-                    onClick={() => window.open('https://datsh.ai', '_blank')}
+                    onClick={() => window.open('https://datshdattashodhini.vercel.app/', '_blank')}
                   >
                     <Terminal className="w-4 h-4 mr-2" />
                     DATSH.AI
@@ -79,7 +79,7 @@ const Navigation = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => window.open('https://datsh.ai', '_blank')}>
+                <DropdownMenuItem onClick={() => window.open('https://datshdattashodhini.vercel.app/', '_blank')}>
                   <Terminal className="w-4 h-4 mr-2" />
                   <span>DATSH.AI</span>
                 </DropdownMenuItem>
