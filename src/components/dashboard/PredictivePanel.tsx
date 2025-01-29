@@ -6,10 +6,17 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from 'lucide-react';
 
 interface PredictivePanelProps {
   data: any[];
@@ -44,7 +51,19 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Trend Prediction</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Trend Prediction</CardTitle>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="h-4 w-4 text-muted-foreground hover:text-primary cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm">
+                  <p>Trend Prediction uses moving averages to analyze and forecast data patterns. The blue line shows actual values, while the purple line represents a 5-period moving average that smooths out fluctuations to reveal underlying trends.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -52,7 +71,7 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey={columns[0]} />
               <YAxis />
-              <Tooltip />
+              <RechartsTooltip />
               <Legend />
               <Line
                 type="monotone"
