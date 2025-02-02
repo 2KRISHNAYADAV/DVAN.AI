@@ -5,7 +5,6 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, BarChart, Bar, Legend, ComposedChart, Area,
 } from 'recharts';
-import { Info } from 'lucide-react';
 
 interface DetailedStatsProps {
   data: any[];
@@ -19,20 +18,24 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   // Filter numeric columns
   const numericColumns = columns.filter(column => {
     const sample = data[0]?.[column];
-    return !isNaN(parseFloat(sample));
+    return typeof sample === 'number' || !isNaN(parseFloat(sample));
   });
 
-  // Prepare data for visualization
+  // Prepare data for visualization with safety checks
   const prepareData = () => {
+    if (!data || !variableX || !variableY) return [];
+    
     return data.slice(0, 100).map(row => ({
-      x: parseFloat(row[variableX]),
-      y: parseFloat(row[variableY]),
+      x: parseFloat(row[variableX]) || 0,
+      y: parseFloat(row[variableY]) || 0,
+      name: `${row[variableX]}-${row[variableY]}`
     })).filter(item => !isNaN(item.x) && !isNaN(item.y));
   };
 
   // Calculate histogram data
   const calculateHistogram = (values: number[], bins = 10) => {
-    if (!values.length) return [];
+    if (!values?.length) return [];
+    
     const min = Math.min(...values);
     const max = Math.max(...values);
     const binWidth = (max - min) / bins;
@@ -45,22 +48,16 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
 
     return histogram.map((count, i) => ({
       bin: `${(min + i * binWidth).toFixed(1)}-${(min + (i + 1) * binWidth).toFixed(1)}`,
-      count
+      count,
+      binStart: min + i * binWidth,
+      binEnd: min + (i + 1) * binWidth
     }));
   };
 
-  // Calculate basic statistics with safety checks
+  // Calculate statistics with safety checks
   const calculateStats = (variable: string) => {
-    if (!variable || !data.length) {
-      return {
-        min: 0,
-        max: 0,
-        mean: 0,
-        median: 0,
-        outliers: 0,
-        q1: 0,
-        q3: 0
-      };
+    if (!variable || !data?.length) {
+      return { min: 0, max: 0, mean: 0, median: 0, q1: 0, q3: 0, outliers: 0 };
     }
 
     const values = data
@@ -68,15 +65,7 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
       .filter(val => !isNaN(val));
 
     if (!values.length) {
-      return {
-        min: 0,
-        max: 0,
-        mean: 0,
-        median: 0,
-        outliers: 0,
-        q1: 0,
-        q3: 0
-      };
+      return { min: 0, max: 0, mean: 0, median: 0, q1: 0, q3: 0, outliers: 0 };
     }
 
     const sorted = [...values].sort((a, b) => a - b);
@@ -90,9 +79,9 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
       max: Math.max(...values),
       mean: values.reduce((a, b) => a + b, 0) / values.length,
       median: sorted[Math.floor(sorted.length / 2)] || 0,
-      outliers: outliers.length,
       q1,
-      q3
+      q3,
+      outliers: outliers.length
     };
   };
 
@@ -101,23 +90,24 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   const statsY = calculateStats(variableY);
 
   // Format number with safety check
-  const formatNumber = (value: number) => {
-    return typeof value === 'number' ? value.toFixed(2) : '0.00';
+  const formatNumber = (value: number | undefined) => {
+    if (value === undefined || isNaN(value)) return '0.00';
+    return value.toFixed(2);
   };
 
   // Prepare box plot data
-  const prepareBoxPlotData = (stats: ReturnType<typeof calculateStats>, variable: string) => {
+  const prepareBoxPlotData = (stats: ReturnType<typeof calculateStats>) => {
     return [{
-      variable,
       min: stats.min,
       q1: stats.q1,
       median: stats.median,
       q3: stats.q3,
-      max: stats.max
+      max: stats.max,
+      name: 'Box Plot'
     }];
   };
 
-  if (!data.length || !columns.length) {
+  if (!data?.length || !columns?.length) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -129,6 +119,8 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
       </Card>
     );
   }
+
+  const boxPlotData = prepareBoxPlotData(statsY);
 
   return (
     <Card className="w-full">
@@ -189,83 +181,32 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
         {/* Scatter Plot */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Correlation Analysis (Scatter Plot)</CardTitle>
+            <CardTitle className="text-lg">Correlation Analysis</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid />
-                  <XAxis type="number" dataKey="x" name={variableX} />
-                  <YAxis type="number" dataKey="y" name={variableY} />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    type="number" 
+                    dataKey="x" 
+                    name={variableX}
+                    label={{ value: variableX, position: 'bottom' }}
+                  />
+                  <YAxis 
+                    type="number" 
+                    dataKey="y" 
+                    name={variableY}
+                    label={{ value: variableY, angle: -90, position: 'left' }}
+                  />
                   <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                  <Scatter name={`${variableX} vs ${variableY}`} data={visualizationData} fill="#8B5CF6" />
+                  <Scatter 
+                    name={`${variableX} vs ${variableY}`} 
+                    data={visualizationData} 
+                    fill="#8B5CF6" 
+                  />
                 </ScatterChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Bar Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Distribution Comparison (Bar Chart)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={visualizationData.slice(0, 20)} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="x" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="y" fill="#8B5CF6" name={variableY} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Line Graph */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Trend Analysis (Line Graph)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={visualizationData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="x" name={variableX} />
-                  <YAxis name={variableY} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="y" stroke="#8B5CF6" name={variableY} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Histogram */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Frequency Distribution (Histogram)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={calculateHistogram(visualizationData.map(d => d.y))}
-                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="bin" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#8B5CF6" name="Frequency" />
-                </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
@@ -280,40 +221,68 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart 
-                  data={prepareBoxPlotData(statsY, variableY)}
+                  data={boxPlotData}
                   margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="variable" />
+                  <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  {/* Box plot visualization using Area and Line components */}
                   <Area
-                    dataKey={['q1', 'q3']}
+                    dataKey="q1"
+                    stackId="1"
                     fill="#8B5CF6"
-                    stroke="#8B5CF6"
-                    name="IQR"
+                    stroke="none"
+                  />
+                  <Area
+                    dataKey="q3"
+                    stackId="1"
+                    fill="#8B5CF6"
+                    stroke="none"
                   />
                   <Line
+                    type="monotone"
                     dataKey="median"
                     stroke="#4C1D95"
                     strokeWidth={2}
-                    name="Median"
                   />
                   <Line
+                    type="monotone"
                     dataKey="min"
                     stroke="#8B5CF6"
                     strokeWidth={1}
-                    name="Min"
                   />
                   <Line
+                    type="monotone"
                     dataKey="max"
                     stroke="#8B5CF6"
                     strokeWidth={1}
-                    name="Max"
                   />
                 </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Histogram */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Frequency Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={calculateHistogram(visualizationData.map(d => d.y))}
+                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="bin" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#8B5CF6" name="Frequency" />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
