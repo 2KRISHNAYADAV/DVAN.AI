@@ -5,8 +5,9 @@ import { DataTable } from './DataTable';
 import { DescriptiveStats } from './DescriptiveStats';
 import { TrendsPanel } from './TrendsPanel';
 import { PredictivePanel } from './PredictivePanel';
+import { DetailedStats } from './DetailedStats';
 import { Navigation } from './Navigation';
-import { LineChart, BarChart, PieChart, Brain } from 'lucide-react';
+import { LineChart, BarChart, PieChart, Brain, ChartBar } from 'lucide-react';
 
 interface DashboardProps {
   data: any[];
@@ -33,7 +34,7 @@ const Dashboard = ({ data, columns }: DashboardProps) => {
 
       {/* Main Dashboard Area */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid grid-cols-4 gap-4 bg-transparent">
+        <TabsList className="grid grid-cols-5 gap-4 bg-transparent">
           <TabsTrigger value="overview" className="data-[state=active]:bg-purple-100">
             <BarChart className="w-4 h-4 mr-2" />
             Overview
@@ -42,7 +43,11 @@ const Dashboard = ({ data, columns }: DashboardProps) => {
             <PieChart className="w-4 h-4 mr-2" />
             Statistics
           </TabsTrigger>
-          <TabsTrigger value="trends" className="data-[state=active]:bg-green-100">
+          <TabsTrigger value="detailed" className="data-[state=active]:bg-green-100">
+            <ChartBar className="w-4 h-4 mr-2" />
+            Detailed Stats
+          </TabsTrigger>
+          <TabsTrigger value="trends" className="data-[state=active]:bg-yellow-100">
             <LineChart className="w-4 h-4 mr-2" />
             Trends
           </TabsTrigger>
@@ -65,6 +70,10 @@ const Dashboard = ({ data, columns }: DashboardProps) => {
 
         <TabsContent value="descriptive" className="space-y-4">
           <DescriptiveStats data={data} columns={columns} />
+        </TabsContent>
+
+        <TabsContent value="detailed" className="space-y-4">
+          <DetailedStats data={data} columns={columns} />
         </TabsContent>
 
         <TabsContent value="trends" className="space-y-4">
