@@ -13,12 +13,12 @@ interface DetailedStatsProps {
 }
 
 export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
-  const [variableX, setVariableX] = useState(columns[0]);
-  const [variableY, setVariableY] = useState(columns[1]);
+  const [variableX, setVariableX] = useState(columns[0] || '');
+  const [variableY, setVariableY] = useState(columns[1] || '');
 
   // Filter numeric columns
   const numericColumns = columns.filter(column => {
-    const sample = data[0][column];
+    const sample = data[0]?.[column];
     return !isNaN(parseFloat(sample));
   });
 
@@ -30,12 +30,35 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     })).filter(item => !isNaN(item.x) && !isNaN(item.y));
   };
 
-  // Calculate basic statistics
+  // Calculate basic statistics with safety checks
   const calculateStats = (variable: string) => {
-    const values = data.map(row => parseFloat(row[variable])).filter(val => !isNaN(val));
+    if (!variable || !data.length) {
+      return {
+        min: 0,
+        max: 0,
+        mean: 0,
+        median: 0,
+        outliers: 0
+      };
+    }
+
+    const values = data
+      .map(row => parseFloat(row[variable]))
+      .filter(val => !isNaN(val));
+
+    if (!values.length) {
+      return {
+        min: 0,
+        max: 0,
+        mean: 0,
+        median: 0,
+        outliers: 0
+      };
+    }
+
     const sorted = [...values].sort((a, b) => a - b);
-    const q1 = sorted[Math.floor(sorted.length * 0.25)];
-    const q3 = sorted[Math.floor(sorted.length * 0.75)];
+    const q1 = sorted[Math.floor(sorted.length * 0.25)] || 0;
+    const q3 = sorted[Math.floor(sorted.length * 0.75)] || 0;
     const iqr = q3 - q1;
     const outliers = values.filter(v => v < q1 - 1.5 * iqr || v > q3 + 1.5 * iqr);
 
@@ -43,7 +66,7 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
       min: Math.min(...values),
       max: Math.max(...values),
       mean: values.reduce((a, b) => a + b, 0) / values.length,
-      median: sorted[Math.floor(sorted.length / 2)],
+      median: sorted[Math.floor(sorted.length / 2)] || 0,
       outliers: outliers.length,
     };
   };
@@ -51,6 +74,24 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   const visualizationData = prepareData();
   const statsX = calculateStats(variableX);
   const statsY = calculateStats(variableY);
+
+  // Format number with safety check
+  const formatNumber = (value: number) => {
+    return typeof value === 'number' ? value.toFixed(2) : '0.00';
+  };
+
+  if (!data.length || !columns.length) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">Detailed Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-gray-500">No data available for analysis</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
@@ -91,18 +132,18 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
           <div className="p-4 bg-purple-50 rounded-lg">
             <h3 className="font-semibold mb-2">{variableX} Statistics</h3>
             <div className="space-y-1 text-sm">
-              <p>Mean: {statsX.mean.toFixed(2)}</p>
-              <p>Median: {statsX.median.toFixed(2)}</p>
-              <p>Range: {statsX.min.toFixed(2)} - {statsX.max.toFixed(2)}</p>
+              <p>Mean: {formatNumber(statsX.mean)}</p>
+              <p>Median: {formatNumber(statsX.median)}</p>
+              <p>Range: {formatNumber(statsX.min)} - {formatNumber(statsX.max)}</p>
               <p>Outliers: {statsX.outliers}</p>
             </div>
           </div>
           <div className="p-4 bg-purple-50 rounded-lg">
             <h3 className="font-semibold mb-2">{variableY} Statistics</h3>
             <div className="space-y-1 text-sm">
-              <p>Mean: {statsY.mean.toFixed(2)}</p>
-              <p>Median: {statsY.median.toFixed(2)}</p>
-              <p>Range: {statsY.min.toFixed(2)} - {statsY.max.toFixed(2)}</p>
+              <p>Mean: {formatNumber(statsY.mean)}</p>
+              <p>Median: {formatNumber(statsY.median)}</p>
+              <p>Range: {formatNumber(statsY.min)} - {formatNumber(statsY.max)}</p>
               <p>Outliers: {statsY.outliers}</p>
             </div>
           </div>
