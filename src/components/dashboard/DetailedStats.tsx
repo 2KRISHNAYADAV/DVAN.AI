@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, BarChart, Bar, Legend, ComposedChart, Area,
+  PieChart, Pie, Cell
 } from 'recharts';
 
 interface DetailedStatsProps {
@@ -11,9 +12,12 @@ interface DetailedStatsProps {
   columns: string[];
 }
 
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe'];
+
 export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   const [variableX, setVariableX] = useState(columns[0] || '');
   const [variableY, setVariableY] = useState(columns[1] || '');
+  const [comparisonType, setComparisonType] = useState('scatter');
 
   // Filter numeric columns
   const numericColumns = columns.filter(column => {
@@ -32,25 +36,29 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     })).filter(item => !isNaN(item.x) && !isNaN(item.y));
   };
 
-  // Calculate histogram data
-  const calculateHistogram = (values: number[], bins = 10) => {
-    if (!values?.length) return [];
+  // Calculate percentage distribution for pie chart
+  const calculatePercentageDistribution = () => {
+    if (!data || !variableX) return [];
     
+    const values = data.map(row => parseFloat(row[variableX])).filter(val => !isNaN(val));
+    const total = values.reduce((acc, val) => acc + val, 0);
+    
+    // Create 5 segments based on value ranges
     const min = Math.min(...values);
     const max = Math.max(...values);
-    const binWidth = (max - min) / bins;
+    const range = max - min;
+    const segmentSize = range / 5;
     
-    const histogram = Array(bins).fill(0);
+    const segments = Array(5).fill(0);
     values.forEach(value => {
-      const binIndex = Math.min(Math.floor((value - min) / binWidth), bins - 1);
-      histogram[binIndex]++;
+      const segmentIndex = Math.min(Math.floor((value - min) / segmentSize), 4);
+      segments[segmentIndex]++;
     });
-
-    return histogram.map((count, i) => ({
-      bin: `${(min + i * binWidth).toFixed(1)}-${(min + (i + 1) * binWidth).toFixed(1)}`,
-      count,
-      binStart: min + i * binWidth,
-      binEnd: min + (i + 1) * binWidth
+    
+    return segments.map((count, index) => ({
+      name: `${(min + index * segmentSize).toFixed(1)}-${(min + (index + 1) * segmentSize).toFixed(1)}`,
+      value: count,
+      percentage: ((count / values.length) * 100).toFixed(1)
     }));
   };
 
@@ -86,6 +94,7 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   };
 
   const visualizationData = prepareData();
+  const pieData = calculatePercentageDistribution();
   const statsX = calculateStats(variableX);
   const statsY = calculateStats(variableY);
 
@@ -95,32 +104,69 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     return value.toFixed(2);
   };
 
-  // Prepare box plot data
-  const prepareBoxPlotData = (stats: ReturnType<typeof calculateStats>) => {
-    return [{
-      min: stats.min,
-      q1: stats.q1,
-      median: stats.median,
-      q3: stats.q3,
-      max: stats.max,
-      name: 'Box Plot'
-    }];
+  const renderVisualization = () => {
+    switch (comparisonType) {
+      case 'scatter':
+        return (
+          <ResponsiveContainer width="100%" height={300}>
+            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                type="number" 
+                dataKey="x" 
+                name={variableX}
+                label={{ value: variableX, position: 'bottom' }}
+              />
+              <YAxis 
+                type="number" 
+                dataKey="y" 
+                name={variableY}
+                label={{ value: variableY, angle: -90, position: 'left' }}
+              />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+              <Scatter name={`${variableX} vs ${variableY}`} data={visualizationData} fill="#8884d8" />
+            </ScatterChart>
+          </ResponsiveContainer>
+        );
+      case 'line':
+        return (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={visualizationData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="x" label={{ value: variableX, position: 'bottom' }} />
+              <YAxis label={{ value: variableY, angle: -90, position: 'left' }} />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="y" stroke="#8884d8" name={variableY} />
+            </LineChart>
+          </ResponsiveContainer>
+        );
+      case 'pie':
+        return (
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label={({ name, percentage }) => `${name} (${percentage}%)`}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value, name) => [`${value} (${pieData[pieData.findIndex(item => item.name === name)]?.percentage}%)`, name]} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        );
+      default:
+        return null;
+    }
   };
-
-  if (!data?.length || !columns?.length) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold">Detailed Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-500">No data available for analysis</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const boxPlotData = prepareBoxPlotData(statsY);
 
   return (
     <Card className="w-full">
@@ -152,11 +198,21 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={comparisonType} onValueChange={setComparisonType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select visualization" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="scatter">Scatter Plot</SelectItem>
+                <SelectItem value="line">Line Chart</SelectItem>
+                <SelectItem value="pie">Pie Chart</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Statistics Summary */}
+        {renderVisualization()}
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 bg-purple-50 rounded-lg">
             <h3 className="font-semibold mb-2">{variableX} Statistics</h3>
@@ -177,116 +233,6 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
             </div>
           </div>
         </div>
-
-        {/* Scatter Plot */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Correlation Analysis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    type="number" 
-                    dataKey="x" 
-                    name={variableX}
-                    label={{ value: variableX, position: 'bottom' }}
-                  />
-                  <YAxis 
-                    type="number" 
-                    dataKey="y" 
-                    name={variableY}
-                    label={{ value: variableY, angle: -90, position: 'left' }}
-                  />
-                  <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                  <Scatter 
-                    name={`${variableX} vs ${variableY}`} 
-                    data={visualizationData} 
-                    fill="#8B5CF6" 
-                  />
-                </ScatterChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Box Plot */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Distribution Analysis (Box Plot)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart 
-                  data={boxPlotData}
-                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Area
-                    dataKey="q1"
-                    stackId="1"
-                    fill="#8B5CF6"
-                    stroke="none"
-                  />
-                  <Area
-                    dataKey="q3"
-                    stackId="1"
-                    fill="#8B5CF6"
-                    stroke="none"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="median"
-                    stroke="#4C1D95"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="min"
-                    stroke="#8B5CF6"
-                    strokeWidth={1}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="max"
-                    stroke="#8B5CF6"
-                    strokeWidth={1}
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Histogram */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Frequency Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={calculateHistogram(visualizationData.map(d => d.y))}
-                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="bin" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#8B5CF6" name="Frequency" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
       </CardContent>
     </Card>
   );
