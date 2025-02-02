@@ -152,13 +152,18 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                label={({ name, percentage }) => `${name} (${percentage}%)`}
+                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(1)}%)`}
               >
                 {pieData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value, name) => [`${value} (${pieData[pieData.findIndex(item => item.name === name)]?.percentage}%)`, name]} />
+              <Tooltip 
+                formatter={(value, name, props) => {
+                  const percent = props.payload.percent;
+                  return [`${value} (${(percent * 100).toFixed(1)}%)`, name];
+                }}
+              />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
