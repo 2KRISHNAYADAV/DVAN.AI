@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  ScatterChart, Scatter, BarChart, Bar, Legend,
+  ScatterChart, Scatter, BarChart, Bar, Legend, ComposedChart, Area,
 } from 'recharts';
 import { Info } from 'lucide-react';
 
@@ -30,6 +30,25 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     })).filter(item => !isNaN(item.x) && !isNaN(item.y));
   };
 
+  // Calculate histogram data
+  const calculateHistogram = (values: number[], bins = 10) => {
+    if (!values.length) return [];
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const binWidth = (max - min) / bins;
+    
+    const histogram = Array(bins).fill(0);
+    values.forEach(value => {
+      const binIndex = Math.min(Math.floor((value - min) / binWidth), bins - 1);
+      histogram[binIndex]++;
+    });
+
+    return histogram.map((count, i) => ({
+      bin: `${(min + i * binWidth).toFixed(1)}-${(min + (i + 1) * binWidth).toFixed(1)}`,
+      count
+    }));
+  };
+
   // Calculate basic statistics with safety checks
   const calculateStats = (variable: string) => {
     if (!variable || !data.length) {
@@ -38,7 +57,9 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
         max: 0,
         mean: 0,
         median: 0,
-        outliers: 0
+        outliers: 0,
+        q1: 0,
+        q3: 0
       };
     }
 
@@ -52,7 +73,9 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
         max: 0,
         mean: 0,
         median: 0,
-        outliers: 0
+        outliers: 0,
+        q1: 0,
+        q3: 0
       };
     }
 
@@ -68,6 +91,8 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
       mean: values.reduce((a, b) => a + b, 0) / values.length,
       median: sorted[Math.floor(sorted.length / 2)] || 0,
       outliers: outliers.length,
+      q1,
+      q3
     };
   };
 
@@ -78,6 +103,18 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   // Format number with safety check
   const formatNumber = (value: number) => {
     return typeof value === 'number' ? value.toFixed(2) : '0.00';
+  };
+
+  // Prepare box plot data
+  const prepareBoxPlotData = (stats: ReturnType<typeof calculateStats>, variable: string) => {
+    return [{
+      variable,
+      min: stats.min,
+      q1: stats.q1,
+      median: stats.median,
+      q3: stats.q3,
+      max: stats.max
+    }];
   };
 
   if (!data.length || !columns.length) {
@@ -152,27 +189,15 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
         {/* Scatter Plot */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Correlation Analysis</CardTitle>
+            <CardTitle className="text-lg">Correlation Analysis (Scatter Plot)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart
-                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                >
+                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                   <CartesianGrid />
-                  <XAxis 
-                    type="number" 
-                    dataKey="x" 
-                    name={variableX}
-                    label={{ value: variableX, position: 'bottom' }}
-                  />
-                  <YAxis 
-                    type="number" 
-                    dataKey="y" 
-                    name={variableY}
-                    label={{ value: variableY, angle: -90, position: 'left' }}
-                  />
+                  <XAxis type="number" dataKey="x" name={variableX} />
+                  <YAxis type="number" dataKey="y" name={variableY} />
                   <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                   <Scatter name={`${variableX} vs ${variableY}`} data={visualizationData} fill="#8B5CF6" />
                 </ScatterChart>
@@ -181,25 +206,114 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
           </CardContent>
         </Card>
 
-        {/* Trend Analysis */}
+        {/* Bar Chart */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Trend Analysis</CardTitle>
+            <CardTitle className="text-lg">Distribution Comparison (Bar Chart)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={visualizationData}
+                <BarChart data={visualizationData.slice(0, 20)} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="x" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="y" fill="#8B5CF6" name={variableY} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Line Graph */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Trend Analysis (Line Graph)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={visualizationData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="x" name={variableX} />
+                  <YAxis name={variableY} />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="y" stroke="#8B5CF6" name={variableY} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Histogram */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Frequency Distribution (Histogram)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={calculateHistogram(visualizationData.map(d => d.y))}
                   margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="x" name={variableX} />
-                  <YAxis dataKey="y" name={variableY} />
+                  <XAxis dataKey="bin" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#8B5CF6" name="Frequency" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Box Plot */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Distribution Analysis (Box Plot)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart 
+                  data={prepareBoxPlotData(statsY, variableY)}
+                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="variable" />
+                  <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="y" stroke="#8B5CF6" name={variableY} dot={false} />
-                </LineChart>
+                  {/* Box plot visualization using Area and Line components */}
+                  <Area
+                    dataKey={['q1', 'q3']}
+                    fill="#8B5CF6"
+                    stroke="#8B5CF6"
+                    name="IQR"
+                  />
+                  <Line
+                    dataKey="median"
+                    stroke="#4C1D95"
+                    strokeWidth={2}
+                    name="Median"
+                  />
+                  <Line
+                    dataKey="min"
+                    stroke="#8B5CF6"
+                    strokeWidth={1}
+                    name="Min"
+                  />
+                  <Line
+                    dataKey="max"
+                    stroke="#8B5CF6"
+                    strokeWidth={1}
+                    name="Max"
+                  />
+                </ComposedChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
