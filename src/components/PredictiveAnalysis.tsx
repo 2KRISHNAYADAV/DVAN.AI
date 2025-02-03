@@ -29,6 +29,7 @@ import MLModelsSection from './predictive/MLModelsSection';
 import TimeSeriesSection from './predictive/TimeSeriesSection';
 import PatternRecognitionSection from './predictive/PatternRecognitionSection';
 import VisualizationSection from './predictive/VisualizationSection';
+import KNNClassification from './predictive/KNNClassification';
 
 const PredictiveAnalysis = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -61,6 +62,13 @@ const PredictiveAnalysis = () => {
       icon: LineChart,
       component: VisualizationSection,
       description: "Visual insights"
+    },
+    {
+      id: "knn",
+      title: "k-NN Classification",
+      icon: Brain,
+      component: KNNClassification,
+      description: "Interactive k-NN visualization"
     }
   ];
 
@@ -99,7 +107,7 @@ const PredictiveAnalysis = () => {
         isExpanded ? "opacity-100 h-auto" : "opacity-0 h-0 overflow-hidden"
       )}>
         <Tabs defaultValue="ml-models" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 h-auto">
+          <TabsList className="grid w-full grid-cols-1 md:grid-cols-5 h-auto">
             {sections.map((section) => (
               <TabsTrigger
                 key={section.id}
