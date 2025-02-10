@@ -8,6 +8,7 @@ export interface ChartData {
   x: number;
   y: number;
   name: string;
+  size?: number; // for bubble charts
 }
 
 export interface PieSegment {
@@ -25,3 +26,4 @@ export interface Stats {
   q3: number;
   outliers: number;
 }
+

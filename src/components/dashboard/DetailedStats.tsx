@@ -62,6 +62,11 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
                 <SelectItem value="scatter">Scatter Plot</SelectItem>
                 <SelectItem value="line">Line Chart</SelectItem>
                 <SelectItem value="pie">Pie Chart</SelectItem>
+                <SelectItem value="bar">Bar Chart</SelectItem>
+                <SelectItem value="area">Area Chart</SelectItem>
+                <SelectItem value="histogram">Histogram</SelectItem>
+                <SelectItem value="box">Box Plot</SelectItem>
+                <SelectItem value="bubble">Bubble Chart</SelectItem>
               </SelectContent>
             </Select>
             <Select value={rowLimit} onValueChange={setRowLimit}>
@@ -95,3 +100,4 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     </Card>
   );
 };
+
