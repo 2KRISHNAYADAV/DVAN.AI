@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -45,30 +44,79 @@ export const ChartVisualization = ({
         mode: 'markers',
         x: data.map(d => d.x),
         y: data.map(d => d.y),
-        z: data.map(d => d.z || Math.random() * 10), // Random z values for demonstration
+        z: data.map(d => d.z || Math.random() * 10),
+        text: data.map(d => d.name),
+        hovertemplate: 
+          `<b>${variableX}</b>: %{x}<br>` +
+          `<b>${variableY}</b>: %{y}<br>` +
+          `<b>Z</b>: %{z}<br>` +
+          `<extra>%{text}</extra>`,
         marker: {
-          size: 5,
-          color: COLORS[0],
-          opacity: 0.8
+          size: 6,
+          color: data.map(d => d.z || 0),
+          colorscale: 'Viridis',
+          opacity: 0.8,
+          showscale: true,
+          colorbar: {
+            title: 'Value',
+            thickness: 20,
+            len: 0.5
+          }
         }
       };
 
       const layout = {
-        title: '3D Scatter Plot',
-        scene: {
-          xaxis: { title: variableX },
-          yaxis: { title: variableY },
-          zaxis: { title: 'Z' }
+        title: {
+          text: `3D Visualization of ${variableX}, ${variableY}, and Z Values`,
+          font: {
+            family: 'Arial, sans-serif',
+            size: 16
+          }
         },
-        margin: { l: 0, r: 0, b: 0, t: 30 },
-        autosize: true
+        scene: {
+          xaxis: { 
+            title: { 
+              text: variableX,
+              font: { size: 12 }
+            },
+            gridcolor: '#E5DEFF'
+          },
+          yaxis: { 
+            title: { 
+              text: variableY,
+              font: { size: 12 }
+            },
+            gridcolor: '#E5DEFF'
+          },
+          zaxis: { 
+            title: { 
+              text: 'Z Values',
+              font: { size: 12 }
+            },
+            gridcolor: '#E5DEFF'
+          },
+          camera: {
+            eye: { x: 1.5, y: 1.5, z: 1.5 }
+          }
+        },
+        margin: { l: 0, r: 0, b: 0, t: 40 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        autosize: true,
+        showlegend: false
       };
 
-      Plotly.newPlot(plotlyContainer.current, [trace], layout, { responsive: true });
+      const config = {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['lasso2d', 'select2d']
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, config);
     }
 
     if (type === '3d-surface') {
-      // Generate sample surface data
       const xValues = Array.from({ length: 50 }, (_, i) => i);
       const yValues = Array.from({ length: 50 }, (_, i) => i);
       const zValues = xValues.map(x => 
@@ -102,7 +150,7 @@ export const ChartVisualization = ({
         type: 'contour',
         x: data.map(d => d.x),
         y: data.map(d => d.y),
-        z: data.map(d => d.z || Math.random() * 10), // Random z values for demonstration
+        z: data.map(d => d.z || Math.random() * 10),
         colorscale: 'Viridis'
       };
 
@@ -117,7 +165,6 @@ export const ChartVisualization = ({
       Plotly.newPlot(plotlyContainer.current, [trace], layout, { responsive: true });
     }
 
-    // Cleanup function
     return () => {
       if (plotlyContainer.current) {
         Plotly.purge(plotlyContainer.current);
@@ -125,9 +172,14 @@ export const ChartVisualization = ({
     };
   }, [type, data, variableX, variableY]);
 
-  // For 3D plots and contour, render the Plotly container
   if (['3d-scatter', '3d-surface', 'contour'].includes(type)) {
-    return <div ref={plotlyContainer} style={{ width: '100%', height: '400px' }} />;
+    return (
+      <div 
+        ref={plotlyContainer} 
+        style={{ width: '100%', height: '500px' }}
+        className="bg-white rounded-lg shadow-lg p-4" 
+      />
+    );
   }
 
   switch (type) {
@@ -367,4 +419,3 @@ export const ChartVisualization = ({
       return null;
   }
 };
-
