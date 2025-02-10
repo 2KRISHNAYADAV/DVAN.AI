@@ -18,6 +18,7 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   const [variableX, setVariableX] = useState(columns[0] || '');
   const [variableY, setVariableY] = useState(columns[1] || '');
   const [comparisonType, setComparisonType] = useState('scatter');
+  const [rowLimit, setRowLimit] = useState('100');
 
   // Filter numeric columns
   const numericColumns = columns.filter(column => {
@@ -25,11 +26,12 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     return typeof sample === 'number' || !isNaN(parseFloat(sample));
   });
 
-  // Prepare data for visualization with safety checks
+  // Prepare data for visualization with safety checks and row limit
   const prepareData = () => {
     if (!data || !variableX || !variableY) return [];
     
-    return data.slice(0, 100).map(row => ({
+    const limit = rowLimit === 'all' ? data.length : parseInt(rowLimit);
+    return data.slice(0, limit).map(row => ({
       x: parseFloat(row[variableX]) || 0,
       y: parseFloat(row[variableY]) || 0,
       name: `${row[variableX]}-${row[variableY]}`
@@ -40,7 +42,11 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   const calculatePercentageDistribution = () => {
     if (!data || !variableX) return [];
     
-    const values = data.map(row => parseFloat(row[variableX])).filter(val => !isNaN(val));
+    const limit = rowLimit === 'all' ? data.length : parseInt(rowLimit);
+    const values = data.slice(0, limit)
+      .map(row => parseFloat(row[variableX]))
+      .filter(val => !isNaN(val));
+    
     const total = values.reduce((acc, val) => acc + val, 0);
     
     // Create 5 segments based on value ranges
@@ -211,6 +217,18 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
                 <SelectItem value="scatter">Scatter Plot</SelectItem>
                 <SelectItem value="line">Line Chart</SelectItem>
                 <SelectItem value="pie">Pie Chart</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={rowLimit} onValueChange={setRowLimit}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Number of rows" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10 Rows</SelectItem>
+                <SelectItem value="20">20 Rows</SelectItem>
+                <SelectItem value="50">50 Rows</SelectItem>
+                <SelectItem value="100">100 Rows</SelectItem>
+                <SelectItem value="all">All Rows</SelectItem>
               </SelectContent>
             </Select>
           </div>
