@@ -10,7 +10,7 @@ import {
   prepareVisualizationData,
   calculatePercentageDistribution,
   calculateStats
-} from './utils/dataProcessing';
+} from '@/components/dashboard/utils/dataProcessing';
 
 export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   const [variableX, setVariableX] = useState(columns[0] || '');
@@ -103,3 +103,4 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     </Card>
   );
 };
+

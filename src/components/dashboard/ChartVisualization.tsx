@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -7,7 +8,6 @@ import {
 import Plotly from 'plotly.js-dist-min';
 import { ChartData, PieSegment } from './types';
 
-// Enhanced color palette
 const COLORS = [
   '#8B5CF6', // Vivid Purple
   '#D946EF', // Magenta Pink
@@ -34,16 +34,18 @@ export const ChartVisualization = ({
   variableX,
   variableY
 }: ChartVisualizationProps) => {
-  const plotlyContainer = useRef(null);
+  const plotlyContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (type === '3d-scatter' && plotlyContainer.current) {
+    if (!plotlyContainer.current) return;
+
+    if (type === '3d-scatter') {
       const trace = {
         type: 'scatter3d',
         mode: 'markers',
         x: data.map(d => d.x),
         y: data.map(d => d.y),
-        z: data.map(d => d.z || 0),
+        z: data.map(d => d.z || Math.random() * 10), // Random z values for demonstration
         marker: {
           size: 5,
           color: COLORS[0],
@@ -58,13 +60,14 @@ export const ChartVisualization = ({
           yaxis: { title: variableY },
           zaxis: { title: 'Z' }
         },
-        margin: { l: 0, r: 0, b: 0, t: 30 }
+        margin: { l: 0, r: 0, b: 0, t: 30 },
+        autosize: true
       };
 
-      Plotly.newPlot(plotlyContainer.current, [trace], layout);
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, { responsive: true });
     }
 
-    if (type === '3d-surface' && plotlyContainer.current) {
+    if (type === '3d-surface') {
       // Generate sample surface data
       const xValues = Array.from({ length: 50 }, (_, i) => i);
       const yValues = Array.from({ length: 50 }, (_, i) => i);
@@ -87,18 +90,19 @@ export const ChartVisualization = ({
           yaxis: { title: variableY },
           zaxis: { title: 'Z' }
         },
-        margin: { l: 0, r: 0, b: 0, t: 30 }
+        margin: { l: 0, r: 0, b: 0, t: 30 },
+        autosize: true
       };
 
-      Plotly.newPlot(plotlyContainer.current, [trace], layout);
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, { responsive: true });
     }
 
-    if (type === 'contour' && plotlyContainer.current) {
+    if (type === 'contour') {
       const trace = {
         type: 'contour',
         x: data.map(d => d.x),
         y: data.map(d => d.y),
-        z: data.map(d => d.z || 0),
+        z: data.map(d => d.z || Math.random() * 10), // Random z values for demonstration
         colorscale: 'Viridis'
       };
 
@@ -106,10 +110,11 @@ export const ChartVisualization = ({
         title: 'Contour Plot',
         xaxis: { title: variableX },
         yaxis: { title: variableY },
-        margin: { l: 50, r: 50, b: 50, t: 50 }
+        margin: { l: 50, r: 50, b: 50, t: 50 },
+        autosize: true
       };
 
-      Plotly.newPlot(plotlyContainer.current, [trace], layout);
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, { responsive: true });
     }
 
     // Cleanup function
@@ -362,3 +367,4 @@ export const ChartVisualization = ({
       return null;
   }
 };
+
