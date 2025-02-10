@@ -1,10 +1,10 @@
-
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, PieChart, Pie, Cell, Legend, BarChart, Bar,
   AreaChart, Area, ComposedChart
 } from 'recharts';
+import Plotly from 'plotly.js-dist-min';
 import { ChartData, PieSegment } from './types';
 
 // Enhanced color palette
@@ -34,6 +34,97 @@ export const ChartVisualization = ({
   variableX,
   variableY
 }: ChartVisualizationProps) => {
+  const plotlyContainer = useRef(null);
+
+  useEffect(() => {
+    if (type === '3d-scatter' && plotlyContainer.current) {
+      const trace = {
+        type: 'scatter3d',
+        mode: 'markers',
+        x: data.map(d => d.x),
+        y: data.map(d => d.y),
+        z: data.map(d => d.z || 0),
+        marker: {
+          size: 5,
+          color: COLORS[0],
+          opacity: 0.8
+        }
+      };
+
+      const layout = {
+        title: '3D Scatter Plot',
+        scene: {
+          xaxis: { title: variableX },
+          yaxis: { title: variableY },
+          zaxis: { title: 'Z' }
+        },
+        margin: { l: 0, r: 0, b: 0, t: 30 }
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace], layout);
+    }
+
+    if (type === '3d-surface' && plotlyContainer.current) {
+      // Generate sample surface data
+      const xValues = Array.from({ length: 50 }, (_, i) => i);
+      const yValues = Array.from({ length: 50 }, (_, i) => i);
+      const zValues = xValues.map(x => 
+        yValues.map(y => Math.sin(Math.sqrt(x * y) / 5))
+      );
+
+      const trace = {
+        type: 'surface',
+        x: xValues,
+        y: yValues,
+        z: zValues,
+        colorscale: 'Viridis'
+      };
+
+      const layout = {
+        title: '3D Surface Plot',
+        scene: {
+          xaxis: { title: variableX },
+          yaxis: { title: variableY },
+          zaxis: { title: 'Z' }
+        },
+        margin: { l: 0, r: 0, b: 0, t: 30 }
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace], layout);
+    }
+
+    if (type === 'contour' && plotlyContainer.current) {
+      const trace = {
+        type: 'contour',
+        x: data.map(d => d.x),
+        y: data.map(d => d.y),
+        z: data.map(d => d.z || 0),
+        colorscale: 'Viridis'
+      };
+
+      const layout = {
+        title: 'Contour Plot',
+        xaxis: { title: variableX },
+        yaxis: { title: variableY },
+        margin: { l: 50, r: 50, b: 50, t: 50 }
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace], layout);
+    }
+
+    // Cleanup function
+    return () => {
+      if (plotlyContainer.current) {
+        Plotly.purge(plotlyContainer.current);
+      }
+    };
+  }, [type, data, variableX, variableY]);
+
+  // For 3D plots and contour, render the Plotly container
+  if (['3d-scatter', '3d-surface', 'contour'].includes(type)) {
+    return <div ref={plotlyContainer} style={{ width: '100%', height: '400px' }} />;
+  }
+
   switch (type) {
     case 'scatter':
       return (
@@ -271,4 +362,3 @@ export const ChartVisualization = ({
       return null;
   }
 };
-

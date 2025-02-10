@@ -67,6 +67,9 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
                 <SelectItem value="histogram">Histogram</SelectItem>
                 <SelectItem value="box">Box Plot</SelectItem>
                 <SelectItem value="bubble">Bubble Chart</SelectItem>
+                <SelectItem value="3d-scatter">3D Scatter Plot</SelectItem>
+                <SelectItem value="3d-surface">3D Surface Plot</SelectItem>
+                <SelectItem value="contour">Contour Plot</SelectItem>
               </SelectContent>
             </Select>
             <Select value={rowLimit} onValueChange={setRowLimit}>
@@ -100,4 +103,3 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
     </Card>
   );
 };
-

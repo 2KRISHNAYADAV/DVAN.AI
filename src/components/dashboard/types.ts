@@ -7,6 +7,7 @@ export interface DetailedStatsProps {
 export interface ChartData {
   x: number;
   y: number;
+  z?: number;
   name: string;
   size?: number; // for bubble charts
 }
@@ -27,3 +28,8 @@ export interface Stats {
   outliers: number;
 }
 
+export interface Surface3DData {
+  x: number[];
+  y: number[];
+  z: number[][];
+}
