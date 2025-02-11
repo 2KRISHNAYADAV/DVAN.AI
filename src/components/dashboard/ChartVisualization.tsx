@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -5,14 +6,14 @@ import {
   AreaChart, Area, ComposedChart
 } from 'recharts';
 import Plotly from 'plotly.js-dist-min';
-import { ChartVisualizationProps } from './types';
+import { ChartVisualizationProps, ChartData, PieSegment } from './types';
 
 const COLORS = [
   '#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#9b87f5', 
   '#7E69AB', '#6E59A5', '#1A1F2C'
 ];
 
-export const ChartVisualization = ({
+export const ChartVisualization: React.FC<ChartVisualizationProps> = ({
   type,
   data,
   pieData,
@@ -20,7 +21,7 @@ export const ChartVisualization = ({
   variableY,
   variableZ,
   isMobile
-}: ChartVisualizationProps) => {
+}) => {
   const plotlyContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -13,7 +13,7 @@ import {
   calculateStats
 } from '@/components/dashboard/utils/dataProcessing';
 
-export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
+export const DetailedStats: React.FC<DetailedStatsProps> = ({ data, columns }) => {
   const [variableX, setVariableX] = useState(columns[0] || '');
   const [variableY, setVariableY] = useState(columns[1] || '');
   const [variableZ, setVariableZ] = useState(columns[2] || '');
