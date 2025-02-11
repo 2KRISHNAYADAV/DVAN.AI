@@ -15,14 +15,18 @@ import {
 export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
   const [variableX, setVariableX] = useState(columns[0] || '');
   const [variableY, setVariableY] = useState(columns[1] || '');
+  const [variableZ, setVariableZ] = useState(columns[2] || '');
   const [comparisonType, setComparisonType] = useState('scatter');
   const [rowLimit, setRowLimit] = useState('100');
 
   const numericColumns = filterNumericColumns(data, columns);
-  const visualizationData = prepareVisualizationData(data, variableX, variableY, rowLimit);
+  const visualizationData = prepareVisualizationData(data, variableX, variableY, variableZ, rowLimit);
   const pieData = calculatePercentageDistribution(data, variableX, rowLimit);
   const statsX = calculateStats(data, variableX);
   const statsY = calculateStats(data, variableY);
+  const statsZ = calculateStats(data, variableZ);
+
+  const show3DControls = ['3d-scatter', '3d-surface', 'contour'].includes(comparisonType);
 
   return (
     <Card className="w-full">
@@ -54,6 +58,20 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
                 ))}
               </SelectContent>
             </Select>
+            {show3DControls && (
+              <Select value={variableZ} onValueChange={setVariableZ}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Z variable" />
+                </SelectTrigger>
+                <SelectContent>
+                  {numericColumns.map(column => (
+                    <SelectItem key={column} value={column}>
+                      {column}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Select value={comparisonType} onValueChange={setComparisonType}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select visualization" />
@@ -94,13 +112,16 @@ export const DetailedStats = ({ data, columns }: DetailedStatsProps) => {
           pieData={pieData}
           variableX={variableX}
           variableY={variableY}
+          variableZ={variableZ}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <StatsDisplay variableName={variableX} stats={statsX} />
           <StatsDisplay variableName={variableY} stats={statsY} />
+          {show3DControls && (
+            <StatsDisplay variableName={variableZ} stats={statsZ} />
+          )}
         </div>
       </CardContent>
     </Card>
   );
 };
-

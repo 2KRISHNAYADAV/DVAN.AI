@@ -24,6 +24,7 @@ interface ChartVisualizationProps {
   pieData: PieSegment[];
   variableX: string;
   variableY: string;
+  variableZ: string;
 }
 
 export const ChartVisualization = ({
@@ -31,7 +32,8 @@ export const ChartVisualization = ({
   data,
   pieData,
   variableX,
-  variableY
+  variableY,
+  variableZ
 }: ChartVisualizationProps) => {
   const plotlyContainer = useRef<HTMLDivElement>(null);
 
@@ -44,21 +46,21 @@ export const ChartVisualization = ({
         mode: 'markers',
         x: data.map(d => d.x),
         y: data.map(d => d.y),
-        z: data.map(d => d.z || Math.random() * 10),
+        z: data.map(d => d.z),
         text: data.map(d => d.name),
         hovertemplate: 
           `<b>${variableX}</b>: %{x}<br>` +
           `<b>${variableY}</b>: %{y}<br>` +
-          `<b>Z</b>: %{z}<br>` +
+          `<b>${variableZ}</b>: %{z}<br>` +
           `<extra>%{text}</extra>`,
         marker: {
           size: 6,
-          color: data.map(d => d.z || 0),
+          color: data.map(d => d.z),
           colorscale: 'Viridis',
           opacity: 0.8,
           showscale: true,
           colorbar: {
-            title: 'Value',
+            title: variableZ,
             thickness: 20,
             len: 0.5
           }
@@ -67,7 +69,7 @@ export const ChartVisualization = ({
 
       const layout = {
         title: {
-          text: `3D Visualization of ${variableX}, ${variableY}, and Z Values`,
+          text: `3D Visualization of ${variableX}, ${variableY}, and ${variableZ}`,
           font: {
             family: 'Arial, sans-serif',
             size: 16
@@ -90,7 +92,7 @@ export const ChartVisualization = ({
           },
           zaxis: { 
             title: { 
-              text: 'Z Values',
+              text: variableZ,
               font: { size: 12 }
             },
             gridcolor: '#E5DEFF'
@@ -117,32 +119,85 @@ export const ChartVisualization = ({
     }
 
     if (type === '3d-surface') {
-      const xValues = Array.from({ length: 50 }, (_, i) => i);
-      const yValues = Array.from({ length: 50 }, (_, i) => i);
-      const zValues = xValues.map(x => 
-        yValues.map(y => Math.sin(Math.sqrt(x * y) / 5))
+      const uniqueX = Array.from(new Set(data.map(d => d.x))).sort((a, b) => a - b);
+      const uniqueY = Array.from(new Set(data.map(d => d.y))).sort((a, b) => a - b);
+      
+      // Create a 2D array for Z values
+      const zValues = Array(uniqueY.length).fill(0).map(() => 
+        Array(uniqueX.length).fill(null)
       );
+
+      // Fill in the Z values
+      data.forEach(point => {
+        const xIndex = uniqueX.indexOf(point.x);
+        const yIndex = uniqueY.indexOf(point.y);
+        if (xIndex !== -1 && yIndex !== -1) {
+          zValues[yIndex][xIndex] = point.z;
+        }
+      });
 
       const trace = {
         type: 'surface',
-        x: xValues,
-        y: yValues,
+        x: uniqueX,
+        y: uniqueY,
         z: zValues,
-        colorscale: 'Viridis'
+        colorscale: 'Viridis',
+        colorbar: {
+          title: variableZ,
+          thickness: 20,
+          len: 0.5
+        }
       };
 
       const layout = {
-        title: '3D Surface Plot',
-        scene: {
-          xaxis: { title: variableX },
-          yaxis: { title: variableY },
-          zaxis: { title: 'Z' }
+        title: {
+          text: `3D Surface Plot of ${variableX}, ${variableY}, and ${variableZ}`,
+          font: {
+            family: 'Arial, sans-serif',
+            size: 16
+          }
         },
-        margin: { l: 0, r: 0, b: 0, t: 30 },
-        autosize: true
+        scene: {
+          xaxis: { 
+            title: { 
+              text: variableX,
+              font: { size: 12 }
+            },
+            gridcolor: '#E5DEFF'
+          },
+          yaxis: { 
+            title: { 
+              text: variableY,
+              font: { size: 12 }
+            },
+            gridcolor: '#E5DEFF'
+          },
+          zaxis: { 
+            title: { 
+              text: variableZ,
+              font: { size: 12 }
+            },
+            gridcolor: '#E5DEFF'
+          },
+          camera: {
+            eye: { x: 1.5, y: 1.5, z: 1.5 }
+          }
+        },
+        margin: { l: 0, r: 0, b: 0, t: 40 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        autosize: true,
+        showlegend: false
       };
 
-      Plotly.newPlot(plotlyContainer.current, [trace], layout, { responsive: true });
+      const config = {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['lasso2d', 'select2d']
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, config);
     }
 
     if (type === 'contour') {
@@ -150,19 +205,55 @@ export const ChartVisualization = ({
         type: 'contour',
         x: data.map(d => d.x),
         y: data.map(d => d.y),
-        z: data.map(d => d.z || Math.random() * 10),
-        colorscale: 'Viridis'
+        z: data.map(d => d.z),
+        colorscale: 'Viridis',
+        colorbar: {
+          title: variableZ,
+          thickness: 20,
+          len: 0.5
+        },
+        contours: {
+          coloring: 'heatmap',
+          showlabels: true
+        }
       };
 
       const layout = {
-        title: 'Contour Plot',
-        xaxis: { title: variableX },
-        yaxis: { title: variableY },
+        title: {
+          text: `Contour Plot of ${variableX}, ${variableY}, and ${variableZ}`,
+          font: {
+            family: 'Arial, sans-serif',
+            size: 16
+          }
+        },
+        xaxis: { 
+          title: {
+            text: variableX,
+            font: { size: 12 }
+          },
+          gridcolor: '#E5DEFF'
+        },
+        yaxis: { 
+          title: {
+            text: variableY,
+            font: { size: 12 }
+          },
+          gridcolor: '#E5DEFF'
+        },
         margin: { l: 50, r: 50, b: 50, t: 50 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
         autosize: true
       };
 
-      Plotly.newPlot(plotlyContainer.current, [trace], layout, { responsive: true });
+      const config = {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['lasso2d', 'select2d']
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, config);
     }
 
     return () => {
@@ -170,7 +261,7 @@ export const ChartVisualization = ({
         Plotly.purge(plotlyContainer.current);
       }
     };
-  }, [type, data, variableX, variableY]);
+  }, [type, data, variableX, variableY, variableZ]);
 
   if (['3d-scatter', '3d-surface', 'contour'].includes(type)) {
     return (

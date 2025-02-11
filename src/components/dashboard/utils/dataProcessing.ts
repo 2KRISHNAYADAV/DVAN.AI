@@ -1,4 +1,3 @@
-
 export const filterNumericColumns = (data: any[], columns: string[]): string[] => {
   return columns.filter(column => {
     const sample = data[0]?.[column];
@@ -10,6 +9,7 @@ export const prepareVisualizationData = (
   data: any[],
   variableX: string,
   variableY: string,
+  variableZ: string,
   rowLimit: string
 ) => {
   if (!data || !variableX || !variableY) return [];
@@ -18,8 +18,9 @@ export const prepareVisualizationData = (
   return data.slice(0, limit).map(row => ({
     x: parseFloat(row[variableX]) || 0,
     y: parseFloat(row[variableY]) || 0,
-    name: `${row[variableX]}-${row[variableY]}`
-  })).filter(item => !isNaN(item.x) && !isNaN(item.y));
+    z: parseFloat(row[variableZ]) || 0,
+    name: `${row[variableX]}-${row[variableY]}-${row[variableZ]}`
+  })).filter(item => !isNaN(item.x) && !isNaN(item.y) && !isNaN(item.z));
 };
 
 export const calculatePercentageDistribution = (
