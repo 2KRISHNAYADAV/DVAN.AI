@@ -296,6 +296,78 @@ export const ChartVisualization: React.FC<ChartVisualizationProps> = ({
       Plotly.newPlot(plotlyContainer.current, [trace1, trace2], layout, baseConfig);
     }
 
+    if (type === 'heatmap') {
+      const uniqueX = Array.from(new Set(data.map(d => d.x))).sort((a, b) => a - b);
+      const uniqueY = Array.from(new Set(data.map(d => d.y))).sort((a, b) => a - b);
+      
+      const zValues = Array(uniqueY.length).fill(0).map(() => 
+        Array(uniqueX.length).fill(null)
+      );
+
+      data.forEach(point => {
+        const xIndex = uniqueX.indexOf(point.x);
+        const yIndex = uniqueY.indexOf(point.y);
+        if (xIndex !== -1 && yIndex !== -1) {
+          zValues[yIndex][xIndex] = point.z;
+        }
+      });
+
+      const trace = {
+        type: 'heatmap',
+        x: uniqueX,
+        y: uniqueY,
+        z: zValues,
+        colorscale: [
+          [0, '#f3e8ff'],    // Light purple
+          [0.25, '#e9d5ff'], // Lighter purple
+          [0.5, '#d8b4fe'],  // Medium purple
+          [0.75, '#c084fc'], // Darker purple
+          [1, '#a855f7']     // Darkest purple
+        ],
+        hoverongaps: false,
+        hovertemplate: 
+          `${variableX}: %{x}<br>` +
+          `${variableY}: %{y}<br>` +
+          `${variableZ}: %{z}<br>` +
+          `<extra></extra>`,
+        colorbar: {
+          title: {
+            text: variableZ,
+            font: { size: isMobile ? 10 : 12 }
+          },
+          thickness: 20,
+          len: 0.5
+        }
+      };
+
+      const layout = {
+        title: {
+          text: `Heatmap of ${variableX}, ${variableY}, and ${variableZ}`,
+          font: { family: 'Arial, sans-serif', size: isMobile ? 14 : 16 }
+        },
+        xaxis: {
+          title: {
+            text: variableX,
+            font: { size: isMobile ? 10 : 12 }
+          },
+          gridcolor: '#E5DEFF'
+        },
+        yaxis: {
+          title: {
+            text: variableY,
+            font: { size: isMobile ? 10 : 12 }
+          },
+          gridcolor: '#E5DEFF'
+        },
+        margin: isMobile ? { l: 50, r: 50, b: 50, t: 50 } : { l: 65, r: 50, b: 65, t: 50 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        autosize: true
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, baseConfig);
+    }
+
     return () => {
       if (plotlyContainer.current) {
         Plotly.purge(plotlyContainer.current);
@@ -303,7 +375,7 @@ export const ChartVisualization: React.FC<ChartVisualizationProps> = ({
     };
   }, [type, data, variableX, variableY, variableZ, isMobile]);
 
-  if (['3d-scatter', '3d-surface', 'contour', 'violin'].includes(type)) {
+  if (['3d-scatter', '3d-surface', 'contour', 'violin', 'heatmap'].includes(type)) {
     return (
       <div 
         ref={plotlyContainer} 

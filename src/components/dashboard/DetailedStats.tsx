@@ -95,6 +95,7 @@ export const DetailedStats: React.FC<DetailedStatsProps> = ({ data, columns }) =
                   <SelectItem value="box">Box Plot</SelectItem>
                   <SelectItem value="bubble">Bubble Chart</SelectItem>
                   <SelectItem value="violin">Violin Plot</SelectItem>
+                  <SelectItem value="heatmap">Heatmap</SelectItem>
                   <SelectItem value="3d-scatter">3D Scatter Plot</SelectItem>
                   <SelectItem value="3d-surface">3D Surface Plot</SelectItem>
                   <SelectItem value="contour">Contour Plot</SelectItem>
