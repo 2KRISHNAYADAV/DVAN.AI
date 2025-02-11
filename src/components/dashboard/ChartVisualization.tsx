@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -229,6 +228,74 @@ export const ChartVisualization: React.FC<ChartVisualizationProps> = ({
       Plotly.newPlot(plotlyContainer.current, [trace], layout, baseConfig);
     }
 
+    if (type === 'violin') {
+      const trace1 = {
+        type: 'violin',
+        x: Array(data.length).fill(variableX),
+        y: data.map(d => d.x),
+        points: 'all',
+        box: {
+          visible: true
+        },
+        line: {
+          color: '#8B5CF6'
+        },
+        meanline: {
+          visible: true
+        },
+        name: variableX,
+        side: 'positive',
+        hoverlabel: { bgcolor: "#FFF" },
+        hovertemplate: `${variableX}: %{y:.2f}<br>Count: %{text}<extra></extra>`,
+        text: data.map(d => d.name)
+      };
+
+      const trace2 = {
+        type: 'violin',
+        x: Array(data.length).fill(variableY),
+        y: data.map(d => d.y),
+        points: 'all',
+        box: {
+          visible: true
+        },
+        line: {
+          color: '#D946EF'
+        },
+        meanline: {
+          visible: true
+        },
+        name: variableY,
+        side: 'negative',
+        hoverlabel: { bgcolor: "#FFF" },
+        hovertemplate: `${variableY}: %{y:.2f}<br>Count: %{text}<extra></extra>`,
+        text: data.map(d => d.name)
+      };
+
+      const layout = {
+        title: {
+          text: `Violin Plot of ${variableX} and ${variableY}`,
+          font: { family: 'Arial, sans-serif', size: isMobile ? 14 : 16 }
+        },
+        yaxis: {
+          title: 'Concentration',
+          zeroline: false,
+          gridcolor: '#E5DEFF'
+        },
+        xaxis: {
+          title: 'Variables',
+          gridcolor: '#E5DEFF'
+        },
+        violingap: 0,
+        violinmode: 'overlay',
+        showlegend: true,
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: isMobile ? { l: 50, r: 50, b: 50, t: 50 } : { l: 50, r: 50, b: 50, t: 50 }
+      };
+
+      Plotly.newPlot(plotlyContainer.current, [trace1, trace2], layout, baseConfig);
+    }
+
     return () => {
       if (plotlyContainer.current) {
         Plotly.purge(plotlyContainer.current);
@@ -236,7 +303,7 @@ export const ChartVisualization: React.FC<ChartVisualizationProps> = ({
     };
   }, [type, data, variableX, variableY, variableZ, isMobile]);
 
-  if (['3d-scatter', '3d-surface', 'contour'].includes(type)) {
+  if (['3d-scatter', '3d-surface', 'contour', 'violin'].includes(type)) {
     return (
       <div 
         ref={plotlyContainer} 

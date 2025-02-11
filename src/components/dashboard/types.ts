@@ -9,7 +9,7 @@ export interface ChartData {
   y: number;
   z?: number;
   name: string;
-  size?: number; // for bubble charts
+  size?: number;
 }
 
 export interface PieSegment {
