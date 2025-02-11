@@ -5,27 +5,12 @@ import {
   AreaChart, Area, ComposedChart
 } from 'recharts';
 import Plotly from 'plotly.js-dist-min';
-import { ChartData, PieSegment } from './types';
+import { ChartVisualizationProps } from './types';
 
 const COLORS = [
-  '#8B5CF6', // Vivid Purple
-  '#D946EF', // Magenta Pink
-  '#F97316', // Bright Orange
-  '#0EA5E9', // Ocean Blue
-  '#9b87f5', // Primary Purple
-  '#7E69AB', // Secondary Purple
-  '#6E59A5', // Tertiary Purple
-  '#1A1F2C'  // Dark Purple
+  '#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#9b87f5', 
+  '#7E69AB', '#6E59A5', '#1A1F2C'
 ];
-
-interface ChartVisualizationProps {
-  type: string;
-  data: ChartData[];
-  pieData: PieSegment[];
-  variableX: string;
-  variableY: string;
-  variableZ: string;
-}
 
 export const ChartVisualization = ({
   type,
@@ -33,12 +18,27 @@ export const ChartVisualization = ({
   pieData,
   variableX,
   variableY,
-  variableZ
+  variableZ,
+  isMobile
 }: ChartVisualizationProps) => {
   const plotlyContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!plotlyContainer.current) return;
+
+    const baseConfig = {
+      responsive: true,
+      displayModeBar: true,
+      displaylogo: false,
+      modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+      toImageButtonOptions: {
+        format: 'png',
+        filename: `${type}_plot`,
+        height: isMobile ? 400 : 500,
+        width: isMobile ? 300 : 700,
+        scale: 2
+      }
+    };
 
     if (type === '3d-scatter') {
       const trace = {
@@ -49,10 +49,10 @@ export const ChartVisualization = ({
         z: data.map(d => d.z),
         text: data.map(d => d.name),
         hovertemplate: 
-          `<b>${variableX}</b>: %{x}<br>` +
-          `<b>${variableY}</b>: %{y}<br>` +
-          `<b>${variableZ}</b>: %{z}<br>` +
-          `<extra>%{text}</extra>`,
+          `<b>${variableX}</b>: %{x:.2f}<br>` +
+          `<b>${variableY}</b>: %{y:.2f}<br>` +
+          `<b>${variableZ}</b>: %{z:.2f}<br>` +
+          `<extra>Point %{text}</extra>`,
         marker: {
           size: 6,
           color: data.map(d => d.z),
@@ -60,7 +60,10 @@ export const ChartVisualization = ({
           opacity: 0.8,
           showscale: true,
           colorbar: {
-            title: variableZ,
+            title: {
+              text: variableZ,
+              font: { size: isMobile ? 10 : 12 }
+            },
             thickness: 20,
             len: 0.5
           }
@@ -70,64 +73,42 @@ export const ChartVisualization = ({
       const layout = {
         title: {
           text: `3D Visualization of ${variableX}, ${variableY}, and ${variableZ}`,
-          font: {
-            family: 'Arial, sans-serif',
-            size: 16
-          }
+          font: { family: 'Arial, sans-serif', size: isMobile ? 14 : 16 }
         },
         scene: {
           xaxis: { 
-            title: { 
-              text: variableX,
-              font: { size: 12 }
-            },
+            title: { text: variableX, font: { size: isMobile ? 10 : 12 } },
             gridcolor: '#E5DEFF'
           },
           yaxis: { 
-            title: { 
-              text: variableY,
-              font: { size: 12 }
-            },
+            title: { text: variableY, font: { size: isMobile ? 10 : 12 } },
             gridcolor: '#E5DEFF'
           },
           zaxis: { 
-            title: { 
-              text: variableZ,
-              font: { size: 12 }
-            },
+            title: { text: variableZ, font: { size: isMobile ? 10 : 12 } },
             gridcolor: '#E5DEFF'
           },
-          camera: {
-            eye: { x: 1.5, y: 1.5, z: 1.5 }
-          }
+          camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
         },
-        margin: { l: 0, r: 0, b: 0, t: 40 },
+        margin: isMobile ? { l: 0, r: 0, b: 0, t: 40 } : { l: 0, r: 0, b: 0, t: 40 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
         autosize: true,
-        showlegend: false
+        showlegend: false,
+        hoverlabel: { bgcolor: "#FFF", font: { size: 12 } }
       };
 
-      const config = {
-        responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modeBarButtonsToRemove: ['lasso2d', 'select2d']
-      };
-
-      Plotly.newPlot(plotlyContainer.current, [trace], layout, config);
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, baseConfig);
     }
 
     if (type === '3d-surface') {
       const uniqueX = Array.from(new Set(data.map(d => d.x))).sort((a, b) => a - b);
       const uniqueY = Array.from(new Set(data.map(d => d.y))).sort((a, b) => a - b);
       
-      // Create a 2D array for Z values
       const zValues = Array(uniqueY.length).fill(0).map(() => 
         Array(uniqueX.length).fill(null)
       );
 
-      // Fill in the Z values
       data.forEach(point => {
         const xIndex = uniqueX.indexOf(point.x);
         const yIndex = uniqueY.indexOf(point.y);
@@ -142,8 +123,16 @@ export const ChartVisualization = ({
         y: uniqueY,
         z: zValues,
         colorscale: 'Viridis',
+        hovertemplate: 
+          `<b>${variableX}</b>: %{x:.2f}<br>` +
+          `<b>${variableY}</b>: %{y:.2f}<br>` +
+          `<b>${variableZ}</b>: %{z:.2f}<br>` +
+          `<extra></extra>`,
         colorbar: {
-          title: variableZ,
+          title: {
+            text: variableZ,
+            font: { size: isMobile ? 10 : 12 }
+          },
           thickness: 20,
           len: 0.5
         }
@@ -152,52 +141,32 @@ export const ChartVisualization = ({
       const layout = {
         title: {
           text: `3D Surface Plot of ${variableX}, ${variableY}, and ${variableZ}`,
-          font: {
-            family: 'Arial, sans-serif',
-            size: 16
-          }
+          font: { family: 'Arial, sans-serif', size: isMobile ? 14 : 16 }
         },
         scene: {
           xaxis: { 
-            title: { 
-              text: variableX,
-              font: { size: 12 }
-            },
+            title: { text: variableX, font: { size: isMobile ? 10 : 12 } },
             gridcolor: '#E5DEFF'
           },
           yaxis: { 
-            title: { 
-              text: variableY,
-              font: { size: 12 }
-            },
+            title: { text: variableY, font: { size: isMobile ? 10 : 12 } },
             gridcolor: '#E5DEFF'
           },
           zaxis: { 
-            title: { 
-              text: variableZ,
-              font: { size: 12 }
-            },
+            title: { text: variableZ, font: { size: isMobile ? 10 : 12 } },
             gridcolor: '#E5DEFF'
           },
-          camera: {
-            eye: { x: 1.5, y: 1.5, z: 1.5 }
-          }
+          camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
         },
-        margin: { l: 0, r: 0, b: 0, t: 40 },
+        margin: isMobile ? { l: 0, r: 0, b: 0, t: 40 } : { l: 0, r: 0, b: 0, t: 40 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
         autosize: true,
-        showlegend: false
+        showlegend: false,
+        hoverlabel: { bgcolor: "#FFF", font: { size: 12 } }
       };
 
-      const config = {
-        responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modeBarButtonsToRemove: ['lasso2d', 'select2d']
-      };
-
-      Plotly.newPlot(plotlyContainer.current, [trace], layout, config);
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, baseConfig);
     }
 
     if (type === 'contour') {
@@ -207,53 +176,56 @@ export const ChartVisualization = ({
         y: data.map(d => d.y),
         z: data.map(d => d.z),
         colorscale: 'Viridis',
+        hovertemplate: 
+          `<b>${variableX}</b>: %{x:.2f}<br>` +
+          `<b>${variableY}</b>: %{y:.2f}<br>` +
+          `<b>${variableZ}</b>: %{z:.2f}<br>` +
+          `<extra></extra>`,
         colorbar: {
-          title: variableZ,
+          title: {
+            text: variableZ,
+            font: { size: isMobile ? 10 : 12 }
+          },
           thickness: 20,
           len: 0.5
         },
         contours: {
           coloring: 'heatmap',
-          showlabels: true
+          showlabels: true,
+          labelfont: {
+            size: isMobile ? 10 : 12,
+            color: 'white'
+          }
         }
       };
 
       const layout = {
         title: {
           text: `Contour Plot of ${variableX}, ${variableY}, and ${variableZ}`,
-          font: {
-            family: 'Arial, sans-serif',
-            size: 16
-          }
+          font: { family: 'Arial, sans-serif', size: isMobile ? 14 : 16 }
         },
         xaxis: { 
           title: {
             text: variableX,
-            font: { size: 12 }
+            font: { size: isMobile ? 10 : 12 }
           },
           gridcolor: '#E5DEFF'
         },
         yaxis: { 
           title: {
             text: variableY,
-            font: { size: 12 }
+            font: { size: isMobile ? 10 : 12 }
           },
           gridcolor: '#E5DEFF'
         },
-        margin: { l: 50, r: 50, b: 50, t: 50 },
+        margin: isMobile ? { l: 50, r: 50, b: 50, t: 50 } : { l: 50, r: 50, b: 50, t: 50 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
-        autosize: true
+        autosize: true,
+        hoverlabel: { bgcolor: "#FFF", font: { size: 12 } }
       };
 
-      const config = {
-        responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modeBarButtonsToRemove: ['lasso2d', 'select2d']
-      };
-
-      Plotly.newPlot(plotlyContainer.current, [trace], layout, config);
+      Plotly.newPlot(plotlyContainer.current, [trace], layout, baseConfig);
     }
 
     return () => {
@@ -261,13 +233,13 @@ export const ChartVisualization = ({
         Plotly.purge(plotlyContainer.current);
       }
     };
-  }, [type, data, variableX, variableY, variableZ]);
+  }, [type, data, variableX, variableY, variableZ, isMobile]);
 
   if (['3d-scatter', '3d-surface', 'contour'].includes(type)) {
     return (
       <div 
         ref={plotlyContainer} 
-        style={{ width: '100%', height: '500px' }}
+        style={{ width: '100%', height: isMobile ? '400px' : '500px' }}
         className="bg-white rounded-lg shadow-lg p-4" 
       />
     );

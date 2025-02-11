@@ -34,3 +34,12 @@ export interface Surface3DData {
   z: number[][];
 }
 
+export interface ChartVisualizationProps {
+  type: string;
+  data: ChartData[];
+  pieData: PieSegment[];
+  variableX: string;
+  variableY: string;
+  variableZ: string;
+  isMobile: boolean;
+}
