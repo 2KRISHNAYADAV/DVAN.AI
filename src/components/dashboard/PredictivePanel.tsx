@@ -38,12 +38,18 @@ interface ModelMetrics {
   r2: number;
 }
 
+interface PredictionResult {
+  predictions: any[];
+  metrics: ModelMetrics;
+}
+
 export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
   const [targetColumn, setTargetColumn] = useState<string>('');
   const [predictorColumns, setPredictorColumns] = useState<string[]>([]);
   const [predictionPeriods, setPredictionPeriods] = useState<string>('5');
   const [modelType, setModelType] = useState<string>('linear');
   const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
+  const [combinedData, setCombinedData] = useState<any[]>([]);
 
   const numericColumns = columns.filter(column => {
     const sample = data[0][column];
@@ -67,7 +73,7 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
   };
 
   // Linear regression prediction
-  const calculateLinearPrediction = (data: any[], target: string, periods: number) => {
+  const calculateLinearPrediction = (data: any[], target: string, periods: number): PredictionResult => {
     const n = data.length;
     const x = Array.from({ length: n }, (_, i) => i);
     const y = data.map(d => parseFloat(d[target]));
@@ -101,18 +107,30 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     const r2 = 1 - (trainPredictions.reduce((acc, pred, i) => acc + Math.pow(pred - y[i], 2), 0) / 
                     y.reduce((acc, yi) => acc + Math.pow(yi - yMean, 2), 0));
 
-    setMetrics({ rmse, mae, r2 });
-
-    return predictions;
+    return {
+      predictions,
+      metrics: { rmse, mae, r2 }
+    };
   };
 
-  const maData = targetColumn ? 
-    calculateMovingAverage(data.slice(0, 100), targetColumn, 5) : [];
+  // Effect to update predictions and metrics when inputs change
+  useEffect(() => {
+    if (!targetColumn) {
+      setCombinedData([]);
+      setMetrics(null);
+      return;
+    }
 
-  const predictions = targetColumn ? 
-    calculateLinearPrediction(data, targetColumn, parseInt(predictionPeriods)) : [];
+    const maData = calculateMovingAverage(data.slice(0, 100), targetColumn, 5);
+    const { predictions, metrics: newMetrics } = calculateLinearPrediction(
+      data,
+      targetColumn,
+      parseInt(predictionPeriods)
+    );
 
-  const combinedData = [...maData, ...predictions];
+    setCombinedData([...maData, ...predictions]);
+    setMetrics(newMetrics);
+  }, [targetColumn, predictionPeriods, data]);
 
   return (
     <div className="space-y-4">
