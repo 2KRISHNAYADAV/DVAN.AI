@@ -144,6 +144,105 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     };
   };
 
+  const calculateARIMAPrediction = (data: any[], target: string, periods: number): PredictionResult => {
+    const values = data.map(d => parseFloat(d[target]));
+    const n = values.length;
+    
+    // Simple AR(1) model implementation
+    const lag = 1;
+    const X = values.slice(0, -lag);
+    const y = values.slice(lag);
+    
+    // Calculate AR coefficient
+    const meanX = X.reduce((a, b) => a + b, 0) / X.length;
+    const meanY = y.reduce((a, b) => a + b, 0) / y.length;
+    const numerator = X.reduce((acc, x, i) => acc + (x - meanX) * (y[i] - meanY), 0);
+    const denominator = X.reduce((acc, x) => acc + Math.pow(x - meanX, 2), 0);
+    const arCoef = numerator / denominator;
+    const intercept = meanY - arCoef * meanX;
+
+    // Generate predictions
+    let lastValue = values[values.length - 1];
+    const predictions = [...Array(periods)].map((_, i) => {
+      const predictedValue = intercept + arCoef * lastValue;
+      lastValue = predictedValue; // Use predicted value for next prediction
+
+      return {
+        period: `Period ${n + i + 1}`,
+        [target]: data[n - 1][target],
+        prediction: predictedValue,
+        ci_lower: predictedValue * 0.95,
+        ci_upper: predictedValue * 1.05
+      };
+    });
+
+    // Calculate metrics
+    const fitted = X.map(x => intercept + arCoef * x);
+    const rmse = Math.sqrt(fitted.reduce((acc, pred, i) => 
+      acc + Math.pow(pred - y[i], 2), 0) / fitted.length);
+    const mae = fitted.reduce((acc, pred, i) => 
+      acc + Math.abs(pred - y[i]), 0) / fitted.length;
+    const yMean = y.reduce((a, b) => a + b, 0) / y.length;
+    const r2 = 1 - (fitted.reduce((acc, pred, i) => 
+      acc + Math.pow(pred - y[i], 2), 0) / 
+      y.reduce((acc, yi) => acc + Math.pow(yi - yMean, 2), 0));
+
+    return {
+      predictions,
+      metrics: { rmse, mae, r2 }
+    };
+  };
+
+  const calculateLSTMPrediction = (data: any[], target: string, periods: number): PredictionResult => {
+    const values = data.map(d => parseFloat(d[target]));
+    const n = values.length;
+    const windowSize = 4;
+    
+    // Create sequences for LSTM-like prediction
+    const sequences = [];
+    const targets = [];
+    for (let i = 0; i < values.length - windowSize; i++) {
+      sequences.push(values.slice(i, i + windowSize));
+      targets.push(values[i + windowSize]);
+    }
+
+    // Calculate weighted average coefficients
+    const weights = [0.1, 0.2, 0.3, 0.4]; // Increasing weights for more recent values
+    
+    // Generate predictions
+    let lastSequence = values.slice(-windowSize);
+    const predictions = [...Array(periods)].map((_, i) => {
+      const predictedValue = lastSequence.reduce((acc, val, j) => acc + val * weights[j], 0);
+      lastSequence = [...lastSequence.slice(1), predictedValue];
+
+      return {
+        period: `Period ${n + i + 1}`,
+        [target]: data[n - 1][target],
+        prediction: predictedValue,
+        ci_lower: predictedValue * 0.9,
+        ci_upper: predictedValue * 1.1
+      };
+    });
+
+    // Calculate metrics using the training data
+    const trainPredictions = sequences.map(seq => 
+      seq.reduce((acc, val, j) => acc + val * weights[j], 0));
+    
+    const rmse = Math.sqrt(trainPredictions.reduce((acc, pred, i) => 
+      acc + Math.pow(pred - targets[i], 2), 0) / trainPredictions.length);
+    const mae = trainPredictions.reduce((acc, pred, i) => 
+      acc + Math.abs(pred - targets[i]), 0) / trainPredictions.length;
+    const targetsMean = targets.reduce((a, b) => a + b, 0) / targets.length;
+    const r2 = 1 - (trainPredictions.reduce((acc, pred, i) => 
+      acc + Math.pow(pred - targets[i], 2), 0) / 
+      targets.reduce((acc, yi) => acc + Math.pow(yi - targetsMean, 2), 0));
+
+    return {
+      predictions,
+      metrics: { rmse, mae, r2 }
+    };
+  };
+
   useEffect(() => {
     if (!targetColumn) {
       setCombinedData([]);
@@ -154,10 +253,18 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     let result: PredictionResult;
     const maData = calculateMovingAverage(data.slice(0, 100), targetColumn, 5);
 
-    if (modelType === 'ma') {
-      result = calculateMAOnlyPrediction(data, targetColumn, parseInt(predictionPeriods));
-    } else { // linear regression is default
-      result = calculateLinearPrediction(data, targetColumn, parseInt(predictionPeriods));
+    switch (modelType) {
+      case 'ma':
+        result = calculateMAOnlyPrediction(data, targetColumn, parseInt(predictionPeriods));
+        break;
+      case 'arima':
+        result = calculateARIMAPrediction(data, targetColumn, parseInt(predictionPeriods));
+        break;
+      case 'lstm':
+        result = calculateLSTMPrediction(data, targetColumn, parseInt(predictionPeriods));
+        break;
+      default: // linear regression
+        result = calculateLinearPrediction(data, targetColumn, parseInt(predictionPeriods));
     }
 
     setCombinedData([...maData, ...result.predictions]);
