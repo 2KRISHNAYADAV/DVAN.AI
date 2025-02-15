@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -56,7 +55,6 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     return !isNaN(parseFloat(sample));
   });
 
-  // Simple moving average calculation
   const calculateMovingAverage = (data: any[], column: string, window: number) => {
     return data.map((row, index) => {
       if (index < window - 1) return { ...row, ma: null };
@@ -72,13 +70,48 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     });
   };
 
-  // Linear regression prediction
+  const calculateMAOnlyPrediction = (data: any[], target: string, periods: number): PredictionResult => {
+    const window = 5;
+    const maData = calculateMovingAverage(data, target, window);
+    const values = maData.map(d => d.ma).filter(Boolean);
+    const n = values.length;
+    
+    const lastValues = values.slice(-window);
+    const avgChange = lastValues.slice(1).reduce((acc, curr, i) => 
+      acc + (curr - lastValues[i]), 0) / (window - 1);
+
+    const lastValue = values[values.length - 1];
+    const predictions = [...Array(periods)].map((_, i) => {
+      const predictedValue = lastValue + avgChange * (i + 1);
+      return {
+        period: `Period ${n + i + 1}`,
+        [target]: data[n - 1][target],
+        prediction: predictedValue,
+        ci_lower: predictedValue * 0.95,
+        ci_upper: predictedValue * 1.05
+      };
+    });
+
+    const mae = values.slice(window).reduce((acc, curr, i) => 
+      acc + Math.abs(curr - values[i + window - 1]), 0) / (n - window);
+    const rmse = Math.sqrt(values.slice(window).reduce((acc, curr, i) => 
+      acc + Math.pow(curr - values[i + window - 1], 2), 0) / (n - window));
+    const yMean = values.reduce((a, b) => a + b, 0) / n;
+    const r2 = 1 - (values.slice(window).reduce((acc, curr, i) => 
+      acc + Math.pow(curr - values[i + window - 1], 2), 0) / 
+      values.reduce((acc, yi) => acc + Math.pow(yi - yMean, 2), 0));
+
+    return {
+      predictions,
+      metrics: { rmse, mae, r2 }
+    };
+  };
+
   const calculateLinearPrediction = (data: any[], target: string, periods: number): PredictionResult => {
     const n = data.length;
     const x = Array.from({ length: n }, (_, i) => i);
     const y = data.map(d => parseFloat(d[target]));
 
-    // Calculate coefficients
     const sumX = x.reduce((a, b) => a + b, 0);
     const sumY = y.reduce((a, b) => a + b, 0);
     const sumXY = x.reduce((a, b, i) => a + b * y[i], 0);
@@ -87,7 +120,6 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
     const intercept = (sumY - slope * sumX) / n;
 
-    // Generate predictions
     const predictions = [...Array(periods)].map((_, i) => {
       const predictedValue = slope * (n + i) + intercept;
       return {
@@ -99,7 +131,6 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
       };
     });
 
-    // Calculate metrics
     const trainPredictions = x.map(xi => slope * xi + intercept);
     const rmse = Math.sqrt(trainPredictions.reduce((acc, pred, i) => acc + Math.pow(pred - y[i], 2), 0) / n);
     const mae = trainPredictions.reduce((acc, pred, i) => acc + Math.abs(pred - y[i]), 0) / n;
@@ -113,7 +144,6 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
     };
   };
 
-  // Effect to update predictions and metrics when inputs change
   useEffect(() => {
     if (!targetColumn) {
       setCombinedData([]);
@@ -121,16 +151,18 @@ export const PredictivePanel = ({ data, columns }: PredictivePanelProps) => {
       return;
     }
 
+    let result: PredictionResult;
     const maData = calculateMovingAverage(data.slice(0, 100), targetColumn, 5);
-    const { predictions, metrics: newMetrics } = calculateLinearPrediction(
-      data,
-      targetColumn,
-      parseInt(predictionPeriods)
-    );
 
-    setCombinedData([...maData, ...predictions]);
-    setMetrics(newMetrics);
-  }, [targetColumn, predictionPeriods, data]);
+    if (modelType === 'ma') {
+      result = calculateMAOnlyPrediction(data, targetColumn, parseInt(predictionPeriods));
+    } else { // linear regression is default
+      result = calculateLinearPrediction(data, targetColumn, parseInt(predictionPeriods));
+    }
+
+    setCombinedData([...maData, ...result.predictions]);
+    setMetrics(result.metrics);
+  }, [targetColumn, predictionPeriods, modelType, data]);
 
   return (
     <div className="space-y-4">
