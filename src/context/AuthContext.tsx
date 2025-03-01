@@ -8,10 +8,11 @@ interface AuthContextProps {
   session: Session | null;
   isLoading: boolean;
   signUp: (email: string, password: string, metadata: { full_name: string; profession: string; gender: string }) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ error?: string; needsEmailVerification?: boolean }>;
   signOut: () => Promise<void>;
   user: any;
   error: string | null;
+  resetError: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -22,6 +23,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Reset error helper function
+  const resetError = () => setError(null);
 
   useEffect(() => {
     // Initialize session
@@ -73,18 +77,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       setError(null);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        throw error;
+        console.error('Sign in error:', error);
+        
+        // Check specifically for email not confirmed errors
+        if (error.message.includes('Email not confirmed')) {
+          return { error: error.message, needsEmailVerification: true };
+        }
+        
+        // For other errors like invalid credentials
+        return { error: error.message };
       }
+      
+      return {}; // Success case, no errors
     } catch (error: any) {
       setError(error.message);
-      console.error('Error signing in:', error.message);
-      throw error;
+      console.error('Error signing in:', error);
+      return { error: error.message };
     }
   };
 
@@ -110,7 +124,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signIn,
     signOut,
-    error
+    error,
+    resetError
   };
 
   return (

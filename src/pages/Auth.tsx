@@ -13,12 +13,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
-  const { signIn, signUp, error, session } = useAuth();
+  const { signIn, signUp, error, session, resetError } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('login');
   const [emailSent, setEmailSent] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -31,6 +32,13 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [profession, setProfession] = useState('');
   const [gender, setGender] = useState('');
+
+  // Reset errors when switching tabs
+  useEffect(() => {
+    setAuthError(null);
+    resetError();
+    setEmailSent(false);
+  }, [activeTab, resetError]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -50,18 +58,24 @@ const Auth = () => {
     
     try {
       setIsLoading(true);
-      await signIn(loginEmail, loginPassword);
+      const result = await signIn(loginEmail, loginPassword);
+      
+      if (result.error) {
+        if (result.needsEmailVerification) {
+          setAuthError('Please check your email to confirm your account before logging in.');
+          setEmailSent(true);
+          setVerificationEmail(loginEmail);
+        } else {
+          setAuthError(result.error);
+        }
+        return;
+      }
+      
       toast.success('Logged in successfully');
       navigate('/');
     } catch (error: any) {
-      console.error('Error signing in:', error);
-      
-      if (error.message.includes('Email not confirmed')) {
-        setAuthError('Please check your email to confirm your account before logging in.');
-        setEmailSent(true);
-      } else {
-        setAuthError(error.message || 'Failed to login');
-      }
+      console.error('Login error:', error);
+      setAuthError(error.message || 'Failed to login');
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +110,7 @@ const Auth = () => {
       
       toast.success('Registration successful! Please check your email for verification.');
       setEmailSent(true);
+      setVerificationEmail(registerEmail);
       setActiveTab('login');
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -108,9 +123,16 @@ const Auth = () => {
   const resendConfirmationEmail = async () => {
     try {
       setIsLoading(true);
+      const emailToUse = verificationEmail || loginEmail || registerEmail;
+      
+      if (!emailToUse) {
+        toast.error('No email address provided');
+        return;
+      }
+      
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: loginEmail || registerEmail,
+        email: emailToUse,
       });
       
       if (error) throw error;
