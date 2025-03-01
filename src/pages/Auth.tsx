@@ -38,7 +38,7 @@ const Auth = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (session) {
-      navigate('/');
+      navigate('/', { replace: true });
     }
   }, [session, navigate]);
 
@@ -61,7 +61,6 @@ const Auth = () => {
       }
       
       toast.success('Logged in successfully');
-      navigate('/');
     } catch (error: any) {
       console.error('Login error:', error);
       setAuthError(error.message || 'Failed to login');
@@ -97,14 +96,8 @@ const Auth = () => {
         gender
       });
       
-      toast.success('Registration successful! You can now log in.');
+      toast.success('Registration successful! Logging you in...');
       
-      // Automatically switch to login tab after successful registration
-      setActiveTab('login');
-      
-      // Pre-fill login email field for convenience
-      setLoginEmail(registerEmail);
-      setLoginPassword('');
     } catch (error: any) {
       console.error('Registration error:', error);
       setAuthError(error.message || 'Registration failed');

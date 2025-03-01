@@ -23,6 +23,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
+  // If authenticated, render children
   return <>{children}</>;
 };
 

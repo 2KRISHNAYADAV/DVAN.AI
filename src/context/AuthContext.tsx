@@ -54,7 +54,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         options: {
           data: metadata,
-          // Set emailRedirectTo to the current origin to handle redirects properly
           emailRedirectTo: `${window.location.origin}/auth`,
         }
       });
@@ -63,8 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw error;
       }
       
-      // Return success even if email verification is pending
-      // This allows the user to proceed without verification
+      // Auto login after signup
+      if (data && data.user) {
+        await signIn(email, password);
+      }
     } catch (error: any) {
       setError(error.message);
       console.error('Error signing up:', error.message);
@@ -84,17 +85,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         console.error('Sign in error:', error);
         
-        // For email not confirmed errors, we'll still allow the user to sign in
+        // Ignore email confirmation errors and proceed with login
         if (error.message.includes('Email not confirmed')) {
-          // Try to sign in anyway by using admin functions (not available in client)
-          // Instead, we'll just return success and let the user proceed
-          return {}; // Return empty object to indicate success
+          // Try to sign in anyway
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          
+          if (signInError) {
+            return { error: signInError.message };
+          }
+          
+          // If we get here, the sign-in was successful despite the email not being confirmed
+          navigate('/');
+          return {};
         }
         
-        // For other errors like invalid credentials
         return { error: error.message };
       }
       
+      // Successfully signed in, navigate to homepage
+      navigate('/');
       return {}; // Success case, no errors
     } catch (error: any) {
       setError(error.message);
