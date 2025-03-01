@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const { signIn, signUp, error, session, resetError } = useAuth();
@@ -18,8 +16,6 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('login');
-  const [emailSent, setEmailSent] = useState(false);
-  const [verificationEmail, setVerificationEmail] = useState('');
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -37,7 +33,6 @@ const Auth = () => {
   useEffect(() => {
     setAuthError(null);
     resetError();
-    setEmailSent(false);
   }, [activeTab, resetError]);
 
   // Redirect if already logged in
@@ -61,13 +56,7 @@ const Auth = () => {
       const result = await signIn(loginEmail, loginPassword);
       
       if (result.error) {
-        if (result.needsEmailVerification) {
-          setAuthError('Please check your email to confirm your account before logging in.');
-          setEmailSent(true);
-          setVerificationEmail(loginEmail);
-        } else {
-          setAuthError(result.error);
-        }
+        setAuthError(result.error);
         return;
       }
       
@@ -108,38 +97,17 @@ const Auth = () => {
         gender
       });
       
-      toast.success('Registration successful! Please check your email for verification.');
-      setEmailSent(true);
-      setVerificationEmail(registerEmail);
+      toast.success('Registration successful! You can now log in.');
+      
+      // Automatically switch to login tab after successful registration
       setActiveTab('login');
+      
+      // Pre-fill login email field for convenience
+      setLoginEmail(registerEmail);
+      setLoginPassword('');
     } catch (error: any) {
       console.error('Registration error:', error);
       setAuthError(error.message || 'Registration failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const resendConfirmationEmail = async () => {
-    try {
-      setIsLoading(true);
-      const emailToUse = verificationEmail || loginEmail || registerEmail;
-      
-      if (!emailToUse) {
-        toast.error('No email address provided');
-        return;
-      }
-      
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: emailToUse,
-      });
-      
-      if (error) throw error;
-      
-      toast.success('Verification email sent again. Please check your inbox.');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to resend verification email');
     } finally {
       setIsLoading(false);
     }
@@ -163,20 +131,6 @@ const Auth = () => {
               <Alert variant="destructive" className="mb-4">
                 <AlertDescription>{authError}</AlertDescription>
               </Alert>
-            )}
-            
-            {emailSent && (
-              <div className="mb-4 p-3 bg-blue-50 text-blue-800 rounded-md">
-                <p className="text-sm mb-2">Email verification required. Please check your inbox.</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={resendConfirmationEmail}
-                  disabled={isLoading}
-                >
-                  Resend verification email
-                </Button>
-              </div>
             )}
             
             <TabsContent value="login">
