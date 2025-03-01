@@ -1,110 +1,49 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Info, FolderKanban, Terminal, MoreVertical } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
+import UserNavigation from './UserNavigation';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from './ui/button';
 
 const Navigation = () => {
+  const { session } = useAuth();
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo/Brand */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src="/lovable-uploads/b147a501-aaa0-4df6-ae76-59e3ec4a1eb8.png" 
-              alt="DVAN.AI Logo" 
-              className="w-6 h-6"
-            />
-            <span className="font-bold text-xl">DVAN.AI</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-colors"
-                    onClick={() => window.open('https://datshdattashodhini.vercel.app/', '_blank')}
-                  >
-                    <Terminal className="w-4 h-4 mr-2" />
-                    DATSH.AI
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Dattashodhini AI – Empowering Precision Through Intelligent Data Cleaning</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <Link to="/about">
-              <Button
-                variant="ghost"
-                className="hover:bg-gray-100 transition-colors"
-              >
-                <Info className="w-4 h-4 mr-2" />
-                About
-              </Button>
+    <header className="fixed w-full bg-white border-b border-gray-200 z-10 top-0 left-0 right-0">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center">
+            <Link to="/" className="text-xl font-bold text-purple-700">
+              DVAN.AI
             </Link>
-
-            <Link to="/portfolio">
-              <Button
-                variant="ghost"
-                className="hover:bg-gray-100 transition-colors"
-              >
-                <FolderKanban className="w-4 h-4 mr-2" />
-                Portfolio
-              </Button>
-            </Link>
+            <nav className="ml-10 hidden md:flex space-x-4">
+              <Link to="/" className="text-gray-600 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">
+                Home
+              </Link>
+              {session && (
+                <>
+                  <Link to="/about" className="text-gray-600 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">
+                    About
+                  </Link>
+                  <Link to="/portfolio" className="text-gray-600 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">
+                    Portfolio
+                  </Link>
+                </>
+              )}
+            </nav>
           </div>
-
-          {/* Mobile Menu */}
-          <div className="md:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-10 w-10 p-0"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => window.open('https://datshdattashodhini.vercel.app/', '_blank')}>
-                  <Terminal className="w-4 h-4 mr-2" />
-                  <span>DATSH.AI</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/about" className="flex items-center">
-                    <Info className="w-4 h-4 mr-2" />
-                    <span>About</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/portfolio" className="flex items-center">
-                    <FolderKanban className="w-4 h-4 mr-2" />
-                    <span>Portfolio</span>
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <div className="flex items-center space-x-4">
+            {session ? (
+              <UserNavigation />
+            ) : (
+              <Link to="/auth">
+                <Button>Login</Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
-    </nav>
+    </header>
   );
 };
 
