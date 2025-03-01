@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
-  const { signIn, signUp, error } = useAuth();
+  const { signIn, signUp, error, session } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('login');
+  const [emailSent, setEmailSent] = useState(false);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -27,11 +32,19 @@ const Auth = () => {
   const [profession, setProfession] = useState('');
   const [gender, setGender] = useState('');
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (session) {
+      navigate('/');
+    }
+  }, [session, navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
     
     if (!loginEmail || !loginPassword) {
-      toast.error('Please fill in all fields');
+      setAuthError('Please fill in all fields');
       return;
     }
     
@@ -41,7 +54,14 @@ const Auth = () => {
       toast.success('Logged in successfully');
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to login');
+      console.error('Error signing in:', error);
+      
+      if (error.message.includes('Email not confirmed')) {
+        setAuthError('Please check your email to confirm your account before logging in.');
+        setEmailSent(true);
+      } else {
+        setAuthError(error.message || 'Failed to login');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -49,14 +69,20 @@ const Auth = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
     
     if (!registerEmail || !registerPassword || !confirmPassword || !fullName || !profession || !gender) {
-      toast.error('Please fill in all fields');
+      setAuthError('Please fill in all fields');
       return;
     }
     
     if (registerPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
+      setAuthError('Passwords do not match');
+      return;
+    }
+
+    if (registerPassword.length < 6) {
+      setAuthError('Password must be at least 6 characters');
       return;
     }
 
@@ -67,10 +93,31 @@ const Auth = () => {
         profession,
         gender
       });
-      toast.success('Registration successful! Please verify your email if required.');
-      navigate('/');
+      
+      toast.success('Registration successful! Please check your email for verification.');
+      setEmailSent(true);
+      setActiveTab('login');
     } catch (error: any) {
-      toast.error(error.message || 'Registration failed');
+      console.error('Registration error:', error);
+      setAuthError(error.message || 'Registration failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendConfirmationEmail = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: loginEmail || registerEmail,
+      });
+      
+      if (error) throw error;
+      
+      toast.success('Verification email sent again. Please check your inbox.');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to resend verification email');
     } finally {
       setIsLoading(false);
     }
@@ -84,11 +131,31 @@ const Auth = () => {
           <CardDescription>Enter your credentials to access the data analysis dashboard</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
+            
+            {authError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
+            
+            {emailSent && (
+              <div className="mb-4 p-3 bg-blue-50 text-blue-800 rounded-md">
+                <p className="text-sm mb-2">Email verification required. Please check your inbox.</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={resendConfirmationEmail}
+                  disabled={isLoading}
+                >
+                  Resend verification email
+                </Button>
+              </div>
+            )}
             
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">

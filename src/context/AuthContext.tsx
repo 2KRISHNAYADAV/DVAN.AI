@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, metadata: { full_name: string; profession: string; gender: string }) => {
     try {
       setError(null);
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -56,6 +56,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         throw error;
       }
+      
+      // Check if email confirmation is required
+      if (data?.user && data.user.identities && data.user.identities.length === 0) {
+        throw new Error('This email is already registered. Please login or reset your password.');
+      }
+      
     } catch (error: any) {
       setError(error.message);
       console.error('Error signing up:', error.message);
@@ -75,8 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         throw error;
       }
-      
-      navigate('/');
     } catch (error: any) {
       setError(error.message);
       console.error('Error signing in:', error.message);
