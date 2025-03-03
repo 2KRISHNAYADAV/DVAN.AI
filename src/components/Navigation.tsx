@@ -18,8 +18,13 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="text-xl font-bold text-purple-700">
-              DVAN.AI
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/placeholder.svg" 
+                alt="DVAN.AI Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="ml-2 text-xl font-bold text-purple-700">DVAN.AI</span>
             </Link>
             
             {/* Desktop Navigation */}
