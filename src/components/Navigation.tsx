@@ -20,9 +20,9 @@ const Navigation = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <img 
-                src="/placeholder.svg" 
+                src="/lovable-uploads/3011df42-2d8a-4c6b-a432-8b8e0da58144.png" 
                 alt="DVAN.AI Logo" 
-                className="h-8 w-auto"
+                className="h-10 w-auto"
               />
               <span className="ml-2 text-xl font-bold text-purple-700">DVAN.AI</span>
             </Link>
