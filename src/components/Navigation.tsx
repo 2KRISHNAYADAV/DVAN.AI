@@ -33,10 +33,15 @@ const Navigation = () => {
               <Link to="/portfolio" className="text-gray-600 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">
                 Portfolio
               </Link>
-              <Link to="/dashboard" className="flex items-center text-gray-600 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">
+              <a 
+                href="https://datshdattashodhini.vercel.app/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center text-gray-600 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium"
+              >
                 <LayoutDashboard className="w-4 h-4 mr-1" />
-                DATSH.AI-Private
-              </Link>
+                DATSH.AI
+              </a>
             </nav>
           </div>
           
@@ -85,14 +90,16 @@ const Navigation = () => {
           >
             Portfolio
           </Link>
-          <Link 
-            to="/dashboard" 
+          <a 
+            href="https://datshdattashodhini.vercel.app/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
             className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-purple-600 hover:bg-gray-50"
             onClick={() => setIsMenuOpen(false)}
           >
             <LayoutDashboard className="w-4 h-4 mr-1" />
-            DATSH.AI-Private
-          </Link>
+            DATSH.AI
+          </a>
         </div>
       </div>
     </header>
