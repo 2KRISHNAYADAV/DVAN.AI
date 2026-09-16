@@ -1,11 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Use the env variable first; fall back to the hardcoded key if unset
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6JPqEzhdR0rjiRCwm-g7CY6ZW1Zc6bFwDnzowudz59jrA';
-const genAI = new GoogleGenerativeAI(API_KEY);
+const getGenAI = () => {
+  const envKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const fallbackKey = 'AQ.Ab8RN6JIXjKPvnYpaxWGDtITGy4qeaJ4X-IFcqeoGigadyRnwQ';
+  
+  const keyToUse = envKey || fallbackKey;
+  return new GoogleGenerativeAI(keyToUse);
+};
 
 export const getGeminiInsight = async (prompt: string): Promise<string> => {
   try {
+    const genAI = getGenAI();
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -38,6 +43,7 @@ export const generateUniversalProfile = async (summary: any, sampleData: any[]):
       }
     `;
 
+    const genAI = getGenAI();
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(prompt);
     const response = await result.response;
