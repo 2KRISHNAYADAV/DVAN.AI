@@ -149,7 +149,7 @@ const KNNClassification = () => {
               step={2}
               className="my-4"
             />
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-[#E2E2E0]/70">
               Current k value: {neighbors[0]}
             </div>
           </div>

@@ -176,7 +176,7 @@ const TimeSeriesSection = () => {
             ))}
           </div>
 
-          <Card className="bg-gray-50">
+          <Card className="bg-[#0E2931]">
             <CardHeader>
               <CardTitle className="text-lg">
                 {examples[activeExample as keyof typeof examples].title}

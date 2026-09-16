@@ -380,7 +380,7 @@ export const ChartVisualization: React.FC<ChartVisualizationProps> = ({
       <div 
         ref={plotlyContainer} 
         style={{ width: '100%', height: isMobile ? '400px' : '500px' }}
-        className="bg-white rounded-lg shadow-lg p-4" 
+        className="bg-[#12484C] rounded-lg shadow-lg p-4" 
       />
     );
   }

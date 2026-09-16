@@ -46,13 +46,13 @@ export const DescriptiveStats = ({ data, columns }: DescriptiveStatsProps) => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Mean</p>
+                <p className="text-sm text-[#E2E2E0]/70">Mean</p>
                 <p className="text-lg font-semibold">
                   {calculateStats(column).mean.toFixed(2)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Median</p>
+                <p className="text-sm text-[#E2E2E0]/70">Median</p>
                 <p className="text-lg font-semibold">
                   {calculateStats(column).median.toFixed(2)}
                 </p>
