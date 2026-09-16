@@ -134,107 +134,14 @@ const NetworkCanvas = () => {
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />;
 };
 
-/* ─────────────────────────────────────────────────────────────────
-   Data
-───────────────────────────────────────────────────────────────── */
-const skills = [
-  { label: 'React / TypeScript', cat: 'Frontend' },
-  { label: 'Tailwind CSS', cat: 'Frontend' },
-  { label: 'Vite / Next.js', cat: 'Frontend' },
-  { label: 'Node.js / Express', cat: 'Backend' },
-  { label: 'Python / FastAPI', cat: 'Backend' },
-  { label: 'Supabase / PostgreSQL', cat: 'Database' },
-  { label: 'Machine Learning', cat: 'AI / Data' },
-  { label: 'NLP Pipelines', cat: 'AI / Data' },
-  { label: 'Data Visualization', cat: 'AI / Data' },
-  { label: 'Google Gemini AI', cat: 'AI / Data' },
-  { label: 'Random Forest / ML.js', cat: 'AI / Data' },
-  { label: 'Vercel / Cloud Deploy', cat: 'Infra' },
-];
 
-const projects = [
-  {
-    name: 'DVAN.AI',
-    badge: 'Current',
-    badgeColor: 'bg-purple-100 text-purple-700 border-purple-200',
-    accentBorder: 'border-t-purple-500',
-    icon: <Sparkles className="w-4 h-4" />,
-    iconBg: 'bg-purple-100 text-purple-700',
-    desc: 'Universal AI Data Intelligence Platform with NLP workspace, ML Studio, AI Copilot, and dynamic AI-generated dashboards for any structured dataset.',
-    link: null,
-  },
-  {
-    name: 'DATSH.AI',
-    badge: '2024',
-    badgeColor: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-    accentBorder: 'border-t-indigo-500',
-    icon: <Database className="w-4 h-4" />,
-    iconBg: 'bg-indigo-100 text-indigo-700',
-    desc: 'Intelligent data preprocessing engine for cleaning, structuring, and preparing any dataset at scale — the backbone behind DVAN.AI.',
-    link: 'https://datshdattashodhini.vercel.app/',
-  },
-  {
-    name: 'Portfolio',
-    badge: '2023',
-    badgeColor: 'bg-sky-100 text-sky-700 border-sky-200',
-    accentBorder: 'border-t-sky-500',
-    icon: <Code2 className="w-4 h-4" />,
-    iconBg: 'bg-sky-100 text-sky-700',
-    desc: 'Modern personal portfolio showcasing projects, technical skills, and professional experience — built with React and Vite.',
-    link: 'https://portfoliokrishna-ahir.vercel.app/',
-  },
-];
-
-const timeline = [
-  {
-    year: '2023',
-    icon: <Code2 className="w-4 h-4" />,
-    color: 'bg-sky-100 text-sky-700',
-    title: 'Started building data tools',
-    detail: 'Began exploring interactive data analysis and built first dashboards using React and Recharts. Discovered my passion for combining AI with data.',
-  },
-  {
-    year: '2024 Q1',
-    icon: <Database className="w-4 h-4" />,
-    color: 'bg-indigo-100 text-indigo-700',
-    title: 'Launched DATSH.AI',
-    detail: 'Built a complete data preprocessing engine for structured datasets. Deployed on Vercel and used it as the foundation for future products.',
-  },
-  {
-    year: '2024 Q3',
-    icon: <BrainCircuit className="w-4 h-4" />,
-    color: 'bg-purple-100 text-purple-700',
-    title: 'Built DVAN.AI',
-    detail: 'Created a universal AI analytics platform merging NLP, ML model training, Gemini AI explanations, and a conversational copilot into a no-code workspace.',
-  },
-  {
-    year: '2025+',
-    icon: <Sparkles className="w-4 h-4" />,
-    color: 'bg-orange-100 text-orange-700',
-    title: 'Expanding AI capabilities',
-    detail: 'Working on real-time data streams, multi-model AI routing, collaborative analysis sessions, and enterprise-grade data governance features.',
-  },
-];
-
-const values = [
-  { icon: <Brain className="w-5 h-5" />, bg: 'bg-purple-100 text-purple-700', title: 'Innovation First', desc: 'Continuously pushing boundaries in data science and AI to create tools that genuinely solve real problems.' },
-  { icon: <GraduationCap className="w-5 h-5" />, bg: 'bg-indigo-100 text-indigo-700', title: 'Democratised Access', desc: 'Making advanced analytics accessible to students, researchers, and businesses — without code or data science degrees.' },
-  { icon: <Award className="w-5 h-5" />, bg: 'bg-emerald-100 text-emerald-700', title: 'Engineering Excellence', desc: 'Obsessive attention to UI/UX, code quality, and system reliability in every product I build.' },
-];
-
-const capabilities = [
-  { icon: <BarChart2 className="w-4 h-4 text-purple-600" />, bg: 'bg-purple-50', title: 'AI Dashboards', sub: 'Auto-generated charts' },
-  { icon: <BrainCircuit className="w-4 h-4 text-indigo-600" />, bg: 'bg-indigo-50', title: 'ML Studio', sub: 'Train models locally' },
-  { icon: <MessageSquare className="w-4 h-4 text-sky-600" />, bg: 'bg-sky-50', title: 'NLP Engine', sub: 'Text intelligence' },
-  { icon: <Sparkles className="w-4 h-4 text-orange-600" />, bg: 'bg-orange-50', title: 'AI Copilot', sub: 'Chat with data' },
-];
 
 /* ─────────────────────────────────────────────────────────────────
    Page Component
 ───────────────────────────────────────────────────────────────── */
 const About = () => {
   return (
-    <div className="min-h-screen bg-[#fcfbfe] font-sans antialiased">
+    <div className="min-h-screen bg-[#0E2931] font-sans antialiased">
       <Navigation />
 
       {/* ══════════════════════════════════════
@@ -264,33 +171,30 @@ const About = () => {
               
               {/* Left Column: Biography & Intro */}
               <div className="lg:col-span-7 space-y-6">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#E2E2E0] border-l-4 border-purple-600 pl-4">
-                  Democratizing Advanced Analytics
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
+                  Advanced Analytics for Everyone
                 </h2>
                 
-                <p className="text-[#E2E2E0]/80 leading-relaxed text-sm">
-                  Most analytics platforms are either too complex for business users or too simplistic to surface meaningful insight. DVAN.AI was designed to bridge this divide. It provides an intuitive, conversational, and visual interface built to transform raw spreadsheets into production-grade intelligence.
+                <p className="text-gray-200 leading-relaxed text-base">
+                  Data analysis should be straightforward. Many platforms require technical skills or provide only basic charts. I created DVAN.AI to solve this problem. It is a visual workspace designed to help you process raw data and generate reliable insights quickly.
                 </p>
 
-                {/* Accent quote block */}
-                <div className="pl-5 border-l-2 border-indigo-400 my-6 bg-indigo-50/30 py-3 pr-3 rounded-r-xl">
-                  <p className="italic text-[#E2E2E0] text-sm leading-relaxed">
-                    "I design and build AI-powered data products that transform raw spreadsheets into executive-grade intelligence. Obsessed with making complex data science genuinely accessible to everyone — no code required."
-                  </p>
-                </div>
+                <p className="text-gray-200 leading-relaxed text-base">
+                  My goal is to build tools that make data science accessible. I want to give everyone the ability to perform advanced analytics without writing code. Alongside DVAN.AI, I have also built DATSH.AI for intelligent data preprocessing and maintain a personal portfolio of engineering projects.
+                </p>
 
-                <p className="text-[#E2E2E0]/80 leading-relaxed text-sm">
-                  Whether you are a researcher, business leader, or developer, this workspace adapts dynamically to your dataset, providing natural language exploration, custom local machine learning modeling, and interactive dashboards instantly.
+                <p className="text-gray-200 leading-relaxed text-base">
+                  Whether you are a business analyst, researcher or student, DVAN.AI adapts to your needs. With built in querying, local models and interactive dashboards, everything you need is in one place.
                 </p>
 
                 {/* Founder signature block */}
-                <div className="flex flex-col items-end pt-4 pr-4">
-                  <span className="font-serif italic text-2xl text-purple-700 font-semibold select-none">
+                <div className="pt-4">
+                  <span className="font-serif italic text-3xl text-teal-400 font-semibold select-none">
                     Krishna Yadav
                   </span>
-                  <span className="text-[11px] text-[#E2E2E0]/60 tracking-wider uppercase mt-1">
-                    Founder, DVAN.AI
-                  </span>
+                  <p className="text-xs text-gray-400 tracking-wider uppercase mt-1 font-medium">
+                    Founder and Engineer
+                  </p>
                 </div>
               </div>
 
@@ -323,13 +227,13 @@ const About = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left Column Text */}
             <div className="lg:col-span-5 space-y-5">
-              <span className="inline-block px-3 py-1 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-100 rounded-full uppercase tracking-widest">
+              <span className="inline-block px-3 py-1 text-xs font-bold text-teal-300 bg-teal-900/30 border border-teal-500/30 rounded-full uppercase tracking-widest">
                 Capabilities
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#E2E2E0] leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
                 Powerful modules for every workflow
               </h2>
-              <p className="text-[#E2E2E0]/70 leading-relaxed text-sm">
+              <p className="text-gray-300 leading-relaxed text-base">
                 DVAN.AI combines visual discovery, automated data prep, machine learning, and AI chat into a single cohesive application layout.
               </p>
             </div>
@@ -337,19 +241,14 @@ const About = () => {
             {/* Right Column 2x2 Grid */}
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
-                { title: 'AI Dashboards', desc: 'Auto-generated chart layouts, predictive projections, and visual summary metrics.', iconColor: 'text-purple-600', bgColor: 'bg-purple-50' },
-                { title: 'ML Studio', desc: 'Train local classification or regression models with automated feature sizing and target selection.', iconColor: 'text-indigo-600', bgColor: 'bg-indigo-50' },
-                { title: 'NLP Engine', desc: 'Convert natural queries directly into custom analytics transformations and cleanups.', iconColor: 'text-sky-600', bgColor: 'bg-sky-50' },
-                { title: 'AI Copilot', desc: 'Context-aware conversational system that chats directly with the variables in your dataset.', iconColor: 'text-orange-600', bgColor: 'bg-orange-50' },
+                { title: 'Data Dashboards', desc: 'Generated chart layouts, predictive projections and visual summary metrics.' },
+                { title: 'ML Studio', desc: 'Train local classification or regression models with automated feature sizing and target selection.' },
+                { title: 'Data Engine', desc: 'Convert queries directly into custom analytics transformations and cleanups.' },
+                { title: 'Data Assistant', desc: 'Context aware system that chats directly with the variables in your dataset.' },
               ].map((c) => (
-                <div key={c.title} className="p-6 bg-[#12484C] rounded-2xl border border-[#2B7574]/20 shadow-sm hover:shadow-md transition-all duration-300 flex items-start gap-4">
-                  <div className={`p-2.5 rounded-xl shrink-0 ${c.bgColor} ${c.iconColor}`}>
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#E2E2E0] text-sm mb-1">{c.title}</h3>
-                    <p className="text-xs text-[#E2E2E0]/70 leading-relaxed">{c.desc}</p>
-                  </div>
+                <div key={c.title} className="p-6 bg-[#0a2f32] rounded-2xl border border-teal-500/20 shadow-sm hover:shadow-md transition-all duration-300">
+                  <h3 className="font-bold text-white text-base mb-2">{c.title}</h3>
+                  <p className="text-sm text-gray-300 leading-relaxed">{c.desc}</p>
                 </div>
               ))}
             </div>
@@ -360,21 +259,18 @@ const About = () => {
             CALL TO ACTION BANNER
         ══════════════════════════════════════ */}
         <FadeUp>
-          <div className="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-2xl p-8 sm:p-12 text-white shadow-xl text-center relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10">
-              <NetworkCanvas />
-            </div>
+          <div className="bg-[#0a2f32] border border-teal-500/20 rounded-2xl p-8 sm:p-12 text-white shadow-xl text-center relative overflow-hidden">
             <div className="relative z-10 max-w-2xl mx-auto space-y-4">
               <h3 className="text-xl sm:text-2xl font-bold">
-                Ready to transform your spreadsheets?
+                Ready to transform your spreadsheets
               </h3>
-              <p className="text-purple-200 text-sm">
-                Get started with DVAN.AI today. Experience self-serve data analytics, local modeling, and visual insights instantly.
+              <p className="text-gray-300 text-sm">
+                Get started with DVAN.AI today. Experience self serve data analytics, local modeling and visual insights instantly.
               </p>
               <div className="pt-2">
                 <a
                   href="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#12484C] text-purple-900 rounded-xl font-bold text-sm hover:bg-[rgba(14,41,49,0.8)] shadow transition-all hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-xl font-bold text-sm hover:bg-teal-500 shadow transition-all hover:scale-[1.02]"
                 >
                   Launch App
                 </a>
@@ -394,31 +290,31 @@ const About = () => {
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-8 pb-12">
           {/* Col 1: Platform Info */}
           <div className="md:col-span-5 space-y-4">
-            <h4 className="font-black text-purple-900 tracking-wider text-lg">DVAN.AI</h4>
-            <p className="text-xs text-[#E2E2E0]/70 leading-relaxed max-w-sm">
+            <h4 className="font-black text-white tracking-wider text-lg">DVAN.AI</h4>
+            <p className="text-sm text-gray-300 leading-relaxed max-w-sm">
               Universal AI Data Intelligence Platform designed to enable natural language workspace capabilities, custom local machine learning models, and automated reporting interfaces.
             </p>
           </div>
 
           {/* Col 2: Navigation Links */}
           <div className="md:col-span-3 space-y-4">
-            <h5 className="font-bold text-[#E2E2E0] text-xs tracking-wider uppercase">NAVIGATION</h5>
-            <ul className="space-y-2 text-xs text-[#E2E2E0]/70">
-              <li><a href="/" className="hover:text-purple-600 transition-colors">Home</a></li>
-              <li><a href="/about" className="hover:text-purple-600 transition-colors">About Us</a></li>
-              <li><a href="https://portfoliokrishna-ahir.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-purple-600 transition-colors">Portfolio</a></li>
+            <h5 className="font-bold text-white text-xs tracking-wider uppercase">NAVIGATION</h5>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li><a href="/" className="hover:text-teal-400 transition-colors">Home</a></li>
+              <li><a href="/about" className="hover:text-teal-400 transition-colors">About Us</a></li>
+              <li><a href="https://er-krishna-yadav.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-colors">Portfolio</a></li>
             </ul>
           </div>
 
           {/* Col 3: Contact/Help */}
           <div className="md:col-span-4 space-y-4">
-            <h5 className="font-bold text-[#E2E2E0] text-xs tracking-wider uppercase">HOW CAN WE HELP YOU?</h5>
-            <div className="space-y-2 text-xs text-[#E2E2E0]/70">
-              <p>Email: <a href="mailto:darya780945@gmail.com" className="hover:text-purple-600 transition-colors">darya780945@gmail.com</a></p>
+            <h5 className="font-bold text-white text-xs tracking-wider uppercase">HOW CAN WE HELP YOU?</h5>
+            <div className="space-y-2 text-sm text-gray-300">
+              <p>Email: <a href="mailto:darya780945@gmail.com" className="hover:text-teal-400 transition-colors">darya780945@gmail.com</a></p>
               <div className="flex gap-3 pt-2">
-                <a href="https://github.com/2KRISHNAYADAV" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-[#0E2931] hover:bg-[rgba(14,41,49,0.8)] hover:text-purple-600 transition-colors"><Github className="w-4 h-4" /></a>
-                <a href="https://www.linkedin.com/in/krishna-yadav-392b61300" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-[#0E2931] hover:bg-[rgba(14,41,49,0.8)] hover:text-purple-600 transition-colors"><Linkedin className="w-4 h-4" /></a>
-                <a href="https://www.instagram.com/krishnayaduvansy58/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-[#0E2931] hover:bg-[rgba(14,41,49,0.8)] hover:text-purple-600 transition-colors"><Instagram className="w-4 h-4" /></a>
+                <a href="https://github.com/2KRISHNAYADAV" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-[#0E2931] hover:bg-[rgba(14,41,49,0.8)] hover:text-teal-400 transition-colors"><Github className="w-4 h-4" /></a>
+                <a href="https://www.linkedin.com/in/krishna-yadav-392b61300" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-[#0E2931] hover:bg-[rgba(14,41,49,0.8)] hover:text-teal-400 transition-colors"><Linkedin className="w-4 h-4" /></a>
+                <a href="https://www.instagram.com/krishnayaduvansy58/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-[#0E2931] hover:bg-[rgba(14,41,49,0.8)] hover:text-teal-400 transition-colors"><Instagram className="w-4 h-4" /></a>
               </div>
             </div>
           </div>

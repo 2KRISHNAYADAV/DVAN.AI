@@ -6,7 +6,7 @@ const Portfolio = () => {
   // Auto-redirect after 3 seconds
   useEffect(() => {
     const t = setTimeout(() => {
-      window.open('https://portfoliokrishna-ahir.vercel.app/', '_blank', 'noopener,noreferrer');
+      window.open('https://er-krishna-yadav.vercel.app/', '_blank', 'noopener,noreferrer');
     }, 2500);
     return () => clearTimeout(t);
   }, []);
@@ -68,7 +68,7 @@ const Portfolio = () => {
           </div>
 
           <a
-            href="https://portfoliokrishna-ahir.vercel.app/"
+            href="https://er-krishna-yadav.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl shadow-[0_8px_24px_-8px_rgba(43,117,116,0.6)] hover:scale-[1.03] transition-all text-sm"

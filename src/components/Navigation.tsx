@@ -39,8 +39,8 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-[#2B7574] flex items-center justify-center shadow-[0_0_16px_-4px_rgba(43,117,116,0.6)] group-hover:shadow-[0_0_24px_-4px_rgba(43,117,116,0.8)] transition-all duration-300">
-                <Sparkles className="w-4 h-4 text-[#E2E2E0]" />
+              <div className="w-8 h-8 flex items-center justify-center transition-all duration-300">
+                <img src="/lovable-uploads/logo.png" alt="DVAN.AI Logo" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-base font-bold text-[#E2E2E0] tracking-tight group-hover:text-white transition-colors">

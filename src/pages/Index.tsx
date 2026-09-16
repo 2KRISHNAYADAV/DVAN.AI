@@ -936,38 +936,38 @@ const features = [
   {
     icon: <BarChart2 className="w-5 h-5" />,
     accent: 'badge-teal',
-    title: 'AI Visual Engine',
-    desc: 'Upload any dataset and instantly receive AI-recommended charts, KPI cards, and interactive dashboards—zero configuration.',
+    title: 'Visual Dashboard',
+    desc: 'Upload any dataset and instantly receive recommended charts, KPI cards, and interactive dashboards with zero configuration.',
   },
   {
     icon: <BrainCircuit className="w-5 h-5" />,
     accent: 'badge-navy',
-    title: 'Machine Learning Studio',
-    desc: 'Train Random Forest models in-browser. Get feature importance, accuracy metrics, and plain-English explanations powered by Gemini.',
+    title: 'Local ML Studio',
+    desc: 'Train models in your browser. Get feature importance, accuracy metrics, and clear explanations.',
   },
   {
     icon: <MessageSquare className="w-5 h-5" />,
     accent: 'badge-red',
-    title: 'NLP Workspace',
-    desc: 'Local sentiment analysis, keyword extraction, N-grams, and topic modelling—no external NLP API required.',
+    title: 'Text Analysis Workspace',
+    desc: 'Perform local sentiment analysis, keyword extraction, and topic modelling directly in the browser.',
   },
   {
     icon: <Database className="w-5 h-5" />,
     accent: 'badge-teal',
-    title: 'Universal Parsing',
-    desc: 'Handles CSV, Excel, any delimiter, any domain. Intelligent column profiling detects data types automatically.',
+    title: 'Universal Data Parsing',
+    desc: 'Handles CSV and Excel formats across any domain. Column profiling detects data types automatically.',
   },
   {
     icon: <LineChart className="w-5 h-5" />,
     accent: 'badge-navy',
     title: 'Comparison Engine',
-    desc: 'Side-by-side segment comparisons, period-over-period analysis, and cross-filter interactions across every chart.',
+    desc: 'Compare segments side by side, perform period over period analysis, and cross filter interactions across charts.',
   },
   {
-    icon: <Sparkles className="w-5 h-5" />,
+    icon: <Database className="w-5 h-5" />,
     accent: 'badge-teal',
-    title: 'AI Data Copilot',
-    desc: 'Ask questions in plain English. The Copilot understands your dataset\'s full context and responds with precision.',
+    title: 'Data Assistant',
+    desc: 'Ask questions in plain English. The assistant understands your data context and responds directly.',
   },
 ];
 
@@ -1087,8 +1087,7 @@ const Index = () => {
                     style={{ ['--tw-translate-y' as string]: '1rem' }}
                   >
                     <span className="inline-flex items-center gap-2 px-3.5 py-1.5 badge-teal rounded-full text-xs font-semibold tracking-widest uppercase">
-                      <Sparkles className="w-3 h-3" />
-                      AI Data Intelligence · v2025
+                      Data Intelligence Platform
                     </span>
                   </div>
 
@@ -1104,7 +1103,7 @@ const Index = () => {
                   </h1>
 
                   <p className="opacity-0 translate-y-4 animate-[fadeUp_0.7s_ease_0.3s_forwards] text-[#E2E2E0]/70 text-lg leading-relaxed max-w-lg">
-                    DVAN.AI is an enterprise-grade, no-code analytics workspace. Upload any structured dataset and immediately access AI dashboards, NLP pipelines, ML model training, and a conversational data copilot.
+                    DVAN.AI is an enterprise-grade, no-code analytics workspace. Upload any structured dataset and immediately access visual dashboards, text analysis pipelines, local model training, and a conversational data assistant.
                   </p>
 
                   <div className="opacity-0 translate-y-4 animate-[fadeUp_0.7s_ease_0.4s_forwards] flex flex-col sm:flex-row gap-4">
@@ -1126,7 +1125,7 @@ const Index = () => {
 
                   {/* Trust badges */}
                   <div className="opacity-0 animate-[fadeUp_0.7s_ease_0.55s_forwards] flex flex-wrap gap-3 pt-2">
-                    {['No-Code Required', 'Local NLP Engine', 'Gemini AI Powered', 'CSV & Excel Support'].map(t => (
+                    {['No-Code Required', 'Local NLP Engine', 'Advanced Analytics Engine', 'CSV & Excel Support'].map(t => (
                       <span key={t} className="inline-flex items-center gap-1.5 text-xs font-medium text-[#E2E2E0]/60">
                         <CheckCircle2 className="w-3.5 h-3.5 text-teal" />
                         {t}
@@ -1327,7 +1326,7 @@ const Index = () => {
                     })}
                   </div>
                   
-                  <div className="absolute -bottom-6 -right-6 bg-teal text-[#E2E2E0] p-4 rounded-xl shadow-[0_12px_40px_-10px_rgba(43,117,116,0.6)] font-bold flex items-center gap-3 animate-float z-30">
+                  <div className="absolute -bottom-2 right-2 sm:-bottom-6 sm:-right-6 bg-teal text-[#E2E2E0] p-4 rounded-xl shadow-[0_12px_40px_-10px_rgba(43,117,116,0.6)] font-bold flex items-center gap-3 animate-float z-30">
                     <BrainCircuit className="w-6 h-6" />
                     <div>
                       <div className="text-xs opacity-80 uppercase tracking-wider">AI Copilot</div>
@@ -1343,7 +1342,7 @@ const Index = () => {
           {/* ══════════════════════════════════════
               FEATURES
           ══════════════════════════════════════ */}
-          <section className="py-28 px-6 bg-dark-teal relative">
+          <section className="py-28 px-6 bg-dark-teal relative overflow-hidden">
             <div className="max-w-6xl mx-auto">
               <FadeUp className="text-center max-w-2xl mx-auto mb-16 space-y-4">
                 <span className="inline-block px-3 py-1 text-xs font-bold badge-teal rounded-full uppercase tracking-widest">
@@ -1377,83 +1376,12 @@ const Index = () => {
             </div>
           </section>
 
-          {/* ══════════════════════════════════════
-              HOW IT WORKS
-          ══════════════════════════════════════ */}
-          <section className="py-28 px-6 bg-[#0E2931] relative">
-            {/* SVG Wave Divider at top */}
-            <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none z-0 rotate-180">
-              <svg className="relative block w-full h-[40px] md:h-[80px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.08,130.83,126.3,201.44,120.3,243.32,116.73,283.47,99.51,321.39,56.44Z" className="fill-dark-teal"></path>
-              </svg>
-            </div>
 
-            <div className="max-w-6xl mx-auto pt-10 relative z-10">
-              <FadeUp className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-                <span className="inline-block px-3 py-1 text-xs font-bold badge-navy rounded-full uppercase tracking-widest">
-                  How It Works
-                </span>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#E2E2E0] tracking-tight">
-                  From file to insight in six steps
-                </h2>
-              </FadeUp>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-                {/* Step list */}
-                <div className="space-y-3">
-                  {steps.map((s, i) => (
-                    <FadeUp key={s.num} delay={i * 60}>
-                      <button
-                        onClick={() => setActiveStep(i)}
-                        className={`w-full text-left flex items-start gap-4 p-4 rounded-xl border transition-all duration-300 ${
-                          activeStep === i
-                            ? 'border-[rgba(43,117,116,0.5)] bg-[rgba(18,72,76,0.6)] shadow-[0_4px_20px_-4px_rgba(43,117,116,0.3)]'
-                            : 'border-transparent bg-transparent hover:bg-[rgba(18,72,76,0.3)]'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${
-                          activeStep === i ? 'bg-teal text-[#E2E2E0]' : 'bg-[#12484C] text-[#E2E2E0]/50'
-                        }`}>
-                          {s.num}
-                        </div>
-                        <div>
-                          <p className={`font-bold text-sm transition-colors ${activeStep === i ? 'text-teal' : 'text-[#E2E2E0]/80'}`}>{s.title}</p>
-                          <p className={`text-xs leading-relaxed mt-0.5 transition-colors ${activeStep === i ? 'text-teal/80' : 'text-[#E2E2E0]/50'}`}>{s.desc}</p>
-                        </div>
-                      </button>
-                    </FadeUp>
-                  ))}
-                </div>
-
-                {/* Active step visual */}
-                <FadeUp delay={200} className="hidden lg:block">
-                  <div className="fabric-card p-8 sticky top-24 flex flex-col items-center justify-center gap-6 min-h-[340px]">
-                    <div className="w-16 h-16 rounded-2xl bg-[rgba(43,117,116,0.15)] border border-[rgba(43,117,116,0.3)] flex items-center justify-center text-teal shadow-inner">
-                      {steps[activeStep].icon}
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs font-bold text-teal tracking-widest uppercase mb-2">Step {steps[activeStep].num}</p>
-                      <h3 className="text-xl font-extrabold text-[#E2E2E0] mb-2">{steps[activeStep].title}</h3>
-                      <p className="text-sm text-[#E2E2E0]/60 leading-relaxed max-w-xs">{steps[activeStep].desc}</p>
-                    </div>
-                    <div className="flex gap-1.5">
-                      {steps.map((_, i) => (
-                        <span
-                          key={i}
-                          className={`block h-1 rounded-full transition-all duration-300 ${i === activeStep ? 'w-6 bg-teal' : 'w-2 bg-[rgba(18,72,76,0.6)]'}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </FadeUp>
-              </div>
-            </div>
-          </section>
 
           {/* ══════════════════════════════════════
               PRODUCT PREVIEW (screenshot grid)
           ══════════════════════════════════════ */}
-          <section className="py-28 px-6 bg-dark-teal relative">
+          <section className="py-28 px-6 bg-dark-teal relative overflow-hidden">
             {/* SVG Wave Divider at top */}
             <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none z-0 rotate-180">
               <svg className="relative block w-full h-[40px] md:h-[80px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -1529,87 +1457,7 @@ const Index = () => {
             </div>
           </section>
 
-          {/* ══════════════════════════════════════
-              3D PROJECTS SHOWCASE
-          ══════════════════════════════════════ */}
-          <section className="relative py-32 px-6 overflow-hidden bg-[#0a1e26] textile-grain">
-            {/* Background smoke canvas */}
-            <SmokeCanvas />
 
-            {/* Aurora orbs */}
-            <div className="aurora-orb absolute top-0 left-1/4 w-[500px] h-[500px] bg-teal-900 opacity-30" />
-            <div className="aurora-orb aurora-orb-2 absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-[#12484C] opacity-25" />
-            <div className="morph-blob absolute top-1/2 right-0 w-[350px] h-[350px] opacity-[0.04] bg-[#7acac8]" />
-
-            {/* Dot grid */}
-            <div className="absolute inset-0 dot-grid opacity-30 pointer-events-none" />
-
-            <div className="relative z-10 max-w-7xl mx-auto">
-              {/* Section header */}
-              <div className="text-center mb-16">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 badge-teal rounded-full mb-5">
-                  <Zap className="w-3 h-3" />
-                  <span className="text-xs font-bold tracking-widest uppercase">Featured Projects</span>
-                </div>
-                <h2 className="text-4xl md:text-5xl font-extrabold text-[#E2E2E0] mb-4">
-                  Built with{' '}
-                  <span className="text-gradient-fire">Passion & Precision</span>
-                </h2>
-                <p className="text-[#E2E2E0]/55 max-w-xl mx-auto text-lg">
-                  A curated collection of AI and data engineering projects — each crafted to push the boundaries of what's possible.
-                </p>
-              </div>
-
-              {/* 3D Project Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
-                {PROJECTS.map((project, i) => (
-                  <div
-                    key={project.id}
-                    className="animate-card-enter"
-                    style={{ animationDelay: `${i * 0.15}s`, animationFillMode: 'both' }}
-                  >
-                    <ProjectCard3D project={project} delay={i * 150} />
-                  </div>
-                ))}
-              </div>
-
-              {/* Neon Stats Bar */}
-              <div className="glass-neon rounded-2xl p-8 scan-line">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                  {[
-                    { value: '3+', label: 'Live Projects', color: '#2B7574' },
-                    { value: '100K+', label: 'Lines of Code', color: '#7acac8' },
-                    { value: '99%', label: 'Uptime', color: '#2B7574' },
-                    { value: 'AI-First', label: 'Architecture', color: '#7acac8' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="text-center">
-                      <div
-                        className="text-3xl md:text-4xl font-extrabold mb-1"
-                        style={{ color: stat.color, textShadow: `0 0 30px ${stat.color}` }}
-                      >
-                        {stat.value}
-                      </div>
-                      <div className="text-xs text-[#E2E2E0]/50 uppercase tracking-widest font-semibold">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bottom CTA */}
-              <div className="text-center mt-12">
-                <a
-                  href="https://portfoliokrishna-ahir.vercel.app/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#2B7574] hover:bg-[#337e7d] text-white font-bold rounded-xl shadow-[0_8px_40px_-8px_rgba(43,117,116,0.6)] hover:shadow-[0_12px_50px_-8px_rgba(43,117,116,0.8)] hover:scale-105 transition-all text-sm"
-                >
-                  <Shield className="w-4 h-4" />
-                  View Full Portfolio
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-          </section>
 
           {/* ══════════════════════════════════════
               FOOTER
@@ -1620,8 +1468,8 @@ const Index = () => {
                 {/* Brand */}
                 <div className="space-y-4 lg:col-span-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-teal flex items-center justify-center shadow-[0_0_16px_-4px_rgba(43,117,116,0.6)]">
-                      <Sparkles className="w-4 h-4 text-[#E2E2E0]" />
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      <img src="/lovable-uploads/logo.png" alt="DVAN.AI Logo" className="w-full h-full object-contain" />
                     </div>
                     <span className="font-extrabold text-[#E2E2E0] text-lg">DVAN.AI</span>
                   </div>
@@ -1678,7 +1526,7 @@ const Index = () => {
                       </a>
                     </li>
                     <li>
-                      <a href="https://portfoliokrishna-ahir.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-teal transition-colors">
+                      <a href="https://er-krishna-yadav.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-teal transition-colors">
                         Portfolio Website
                       </a>
                     </li>
@@ -1686,9 +1534,8 @@ const Index = () => {
                 </div>
               </div>
 
-              <div className="border-t border-[rgba(43,117,116,0.15)] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+              <div className="border-t border-[rgba(43,117,116,0.15)] pt-8 text-center text-xs">
                 <p>© 2025 DVAN.AI. All rights reserved. Built by Krishna Yadav.</p>
-                <p className="text-[#E2E2E0]/40">Powered by Google Gemini · React · TypeScript</p>
               </div>
             </div>
           </footer>
